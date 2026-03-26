@@ -50,3 +50,11 @@ export interface ZoneConfig {
   minPercentile: number;
   maxPercentile: number;
 }
+
+export interface Constituent {
+  symbol: string;
+  name: string;
+  tradedValue: number;
+  lastPrice: number;
+  pChange: number;
+}

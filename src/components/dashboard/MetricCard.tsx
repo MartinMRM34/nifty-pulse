@@ -49,13 +49,12 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
           }
         />
         <span
-          className={`text-sm font-medium ${
-            Math.abs(diffFromMedian) < 0.1
+          className={`text-sm font-medium ${Math.abs(diffFromMedian) < 0.1
               ? "text-gray-400"
               : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
                 ? "text-red-500"
                 : "text-green-500"
-          }`}
+            }`}
         >
           {isAboveMedian ? "+" : ""}
           {diffPercent}% vs median

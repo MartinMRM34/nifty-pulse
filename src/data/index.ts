@@ -1,19 +1,8 @@
-import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
-import nifty50Data from "./history/nifty-50.json";
-import niftyNext50Data from "./history/nifty-next-50.json";
-import niftyMidcap150Data from "./history/nifty-midcap-150.json";
-import niftySmallcap250Data from "./history/nifty-smallcap-250.json";
-import niftyLargemidcap250Data from "./history/nifty-largemidcap-250.json";
-import nifty500Data from "./history/nifty-500.json";
+"use server";
 
-const dataMap: Record<string, ValuationSnapshot[]> = {
-  "nifty-50": nifty50Data as ValuationSnapshot[],
-  "nifty-next-50": niftyNext50Data as ValuationSnapshot[],
-  "nifty-midcap-150": niftyMidcap150Data as ValuationSnapshot[],
-  "nifty-smallcap-250": niftySmallcap250Data as ValuationSnapshot[],
-  "nifty-largemidcap-250": niftyLargemidcap250Data as ValuationSnapshot[],
-  "nifty-500": nifty500Data as ValuationSnapshot[],
-};
+import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
+import { getDb } from "@/lib/mongodb";
+import { unstable_cache } from "next/cache";
 
 function computePercentile(sortedValues: number[], value: number): number {
   const below = sortedValues.filter((v) => v < value).length;
@@ -36,12 +25,41 @@ function computeStats(values: number[], current: number): ValuationStats {
   };
 }
 
-export function getIndexValuation(indexId: IndexId): IndexValuation | null {
-  const history = dataMap[indexId];
-  if (!history || history.length === 0) return null;
+async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | null> {
+  let history: ValuationSnapshot[] = [];
+
+  try {
+    // Try MongoDB first
+    const db = await getDb();
+    const collectionName = `history_${indexId.replace(/-/g, "_")}`;
+    const records = await db.collection(collectionName)
+      .find({})
+      .sort({ date: 1 })
+      .toArray();
+
+    if (records.length > 0) {
+      history = records.map(r => ({
+        date: r.date,
+        pe: r.pe,
+        pb: r.pb,
+        dividendYield: r.dividendYield
+      }));
+    }
+    // No local fallback — if MongoDB has no data, history stays empty
+  } catch (error) {
+    console.error("MongoDB fetch failed:", error);
+    // No local fallback — return null below
+  }
+
+  if (history.length === 0) return null;
 
   const latest = history[history.length - 1];
-  const peValues = history.map((h) => h.pe);
+
+  // For P/E, we limit history to post-Mar-2021 to avoid the Standalone vs Consolidated reporting skew.
+  // NSE switched to consolidated PE on April 1, 2021.
+  const modernPEHistory = history.filter(h => h.date >= "2021-04-01");
+  const peValues = modernPEHistory.length > 0 ? modernPEHistory.map((h) => h.pe) : history.map((h) => h.pe);
+
   const pbValues = history.map((h) => h.pb);
   const dyValues = history.map((h) => h.dividendYield);
 
@@ -55,6 +73,8 @@ export function getIndexValuation(indexId: IndexId): IndexValuation | null {
   };
 }
 
-export function getAvailableIndices(): IndexId[] {
-  return Object.keys(dataMap) as IndexId[];
-}
+export const getIndexValuation = unstable_cache(
+  async (indexId: IndexId) => fetchIndexValuation(indexId),
+  ["index-valuation"],
+  { revalidate: 3600, tags: ["valuation"] }
+);

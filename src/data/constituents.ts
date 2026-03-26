@@ -1,23 +1,36 @@
-import nifty50Constituents from "./constituents/nifty-50-constituents.json";
-import niftyNext50Constituents from "./constituents/nifty-next-50-constituents.json";
-import niftyMidcap150Constituents from "./constituents/nifty-midcap-150-constituents.json";
-import niftySmallcap250Constituents from "./constituents/nifty-smallcap-250-constituents.json";
-import niftyLargemidcap250Constituents from "./constituents/nifty-largemidcap-250-constituents.json";
-import nifty500Constituents from "./constituents/nifty-500-constituents.json";
+"use server";
 
-export interface Constituent {
-  symbol: string;
-  name: string;
-  tradedValue: number;
-  lastPrice: number;
-  pChange: number;
-}
+import { IndexId, Constituent } from "@/types";
+import { getDb } from "@/lib/mongodb";
 
-export const constituentsMap: Record<string, Constituent[]> = {
-  "nifty-50": nifty50Constituents as Constituent[],
-  "nifty-next-50": niftyNext50Constituents as Constituent[],
-  "nifty-midcap-150": niftyMidcap150Constituents as Constituent[],
-  "nifty-smallcap-250": niftySmallcap250Constituents as Constituent[],
-  "nifty-largemidcap-250": niftyLargemidcap250Constituents as Constituent[],
-  "nifty-500": nifty500Constituents as Constituent[],
+// FALLBACK DATA (JSON)
+import n50 from "./constituents/nifty-50-constituents.json";
+import nNext50 from "./constituents/nifty-next-50-constituents.json";
+import nMid150 from "./constituents/nifty-midcap-150-constituents.json";
+import nSmall250 from "./constituents/nifty-smallcap-250-constituents.json";
+import nLargeMid250 from "./constituents/nifty-largemidcap-250-constituents.json";
+import n500 from "./constituents/nifty-500-constituents.json";
+
+const localConstituentsMap: Record<string, Constituent[]> = {
+  "nifty-50": n50 as Constituent[],
+  "nifty-next-50": nNext50 as Constituent[],
+  "nifty-midcap-150": nMid150 as Constituent[],
+  "nifty-smallcap-250": nSmall250 as Constituent[],
+  "nifty-largemidcap-250": nLargeMid250 as Constituent[],
+  "nifty-500": n500 as Constituent[],
 };
+
+export async function getConstituents(indexId: IndexId): Promise<Constituent[]> {
+  try {
+    const db = await getDb();
+    const record = await db.collection("constituents").findOne({ index_id: indexId });
+    
+    if (record && record.stocks) {
+      return record.stocks;
+    }
+  } catch (error) {
+    console.error("MongoDB constituents fetch failed:", error);
+  }
+  
+  return localConstituentsMap[indexId] || [];
+}

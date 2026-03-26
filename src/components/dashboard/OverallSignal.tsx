@@ -84,6 +84,9 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           <span className="text-[10px] text-gray-400">Overvalued</span>
         </div>
       </div>
+      <p className="mt-4 text-[10px] text-gray-400 italic">
+        * Valuation percentiles for P/E are calculated based on post-April 2021 consolidated reporting standards.
+      </p>
     </div>
   );
 }

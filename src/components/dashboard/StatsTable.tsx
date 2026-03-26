@@ -30,7 +30,7 @@ export default function StatsTable({ valuation }: StatsTableProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
       <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
         Valuation Summary
       </h3>

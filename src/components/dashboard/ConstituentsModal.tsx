@@ -1,9 +1,10 @@
 "use client";
 
-import { IndexId } from "@/types";
+import { useState, useEffect } from "react";
+import { IndexId, Constituent } from "@/types";
 import { INDICES } from "@/lib/constants";
-import { X, ExternalLink } from "lucide-react";
-import { constituentsMap } from "@/data/constituents";
+import { X, ExternalLink, Loader2 } from "lucide-react";
+import { getConstituents } from "@/data/constituents";
 
 interface ConstituentsModalProps {
   isOpen: boolean;
@@ -12,10 +13,29 @@ interface ConstituentsModalProps {
 }
 
 export default function ConstituentsModal({ isOpen, onClose, indexId }: ConstituentsModalProps) {
+  const [constituents, setConstituents] = useState<Constituent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      async function loadConstituents() {
+        setIsLoading(true);
+        try {
+          const data = await getConstituents(indexId);
+          setConstituents(data || []);
+        } catch (err) {
+          console.error("Failed to load constituents:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      loadConstituents();
+    }
+  }, [isOpen, indexId]);
+
   if (!isOpen) return null;
 
   const indexMeta = INDICES.find((i) => i.id === indexId);
-  const constituents = constituentsMap[indexId] || [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
@@ -24,7 +44,7 @@ export default function ConstituentsModal({ isOpen, onClose, indexId }: Constitu
           <div>
             <h2 className="text-lg font-bold text-gray-900">Index Constituents</h2>
             <p className="text-sm text-gray-500">
-              {indexMeta?.name} <span className="text-xs ml-1 bg-gray-100 px-2 py-0.5 rounded-full">{constituents.length} stocks</span>
+              {indexMeta?.name} {!isLoading && <span className="text-xs ml-1 bg-gray-100 px-2 py-0.5 rounded-full">{constituents.length} stocks</span>}
             </p>
           </div>
           <button
@@ -36,7 +56,12 @@ export default function ConstituentsModal({ isOpen, onClose, indexId }: Constitu
         </div>
         
         <div className="p-0 sm:p-2 max-h-[60vh] overflow-y-auto">
-          {constituents.length > 0 ? (
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              <p className="text-sm text-gray-400">Loading stocks...</p>
+            </div>
+          ) : constituents.length > 0 ? (
             <div className="space-y-1">
               <div className="flex justify-between px-5 sm:px-3 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider sticky top-0 bg-white/95 backdrop-blur z-10">
                 <span>Company</span>

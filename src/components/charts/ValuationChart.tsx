@@ -20,6 +20,8 @@ interface ValuationChartProps {
   median: number;
   title: string;
   color: string;
+  timeRange: "1Y" | "3Y" | "5Y" | "MAX";
+  height?: string;
 }
 
 const metricLabels: Record<string, string> = {
@@ -28,16 +30,27 @@ const metricLabels: Record<string, string> = {
   dividendYield: "Dividend Yield (%)",
 };
 
-export default function ValuationChart({ data, metric, median, title, color }: ValuationChartProps) {
-  const [timeRange, setTimeRange] = useState<"1Y" | "5Y" | "MAX">("5Y");
-
+export default function ValuationChart({
+  data,
+  metric,
+  median,
+  title,
+  color,
+  timeRange,
+  height = "h-64"
+}: ValuationChartProps) {
   const filteredData = useMemo(() => {
     if (!data.length) return [];
     if (timeRange === "MAX") return data;
 
     const latestTimestamp = new Date(data[data.length - 1].date).getTime();
     const oneYearMs = 365.25 * 24 * 60 * 60 * 1000;
-    const cutoffVal = timeRange === "1Y" ? latestTimestamp - oneYearMs : latestTimestamp - 5 * oneYearMs;
+
+    let multiplier = 1;
+    if (timeRange === "3Y") multiplier = 3;
+    if (timeRange === "5Y") multiplier = 5;
+
+    const cutoffVal = latestTimestamp - multiplier * oneYearMs;
 
     return data.filter((d) => new Date(d.date).getTime() >= cutoffVal);
   }, [data, timeRange]);
@@ -49,6 +62,11 @@ export default function ValuationChart({ data, metric, median, title, color }: V
       month: "short",
       year: "numeric",
     }),
+    fullDate: new Date(d.date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }),
   }));
 
   return (
@@ -57,23 +75,8 @@ export default function ValuationChart({ data, metric, median, title, color }: V
         <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
           {title}
         </h3>
-        <div className="flex bg-gray-100 rounded-lg p-1">
-          {(["1Y", "5Y", "MAX"] as const).map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                timeRange === range
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
       </div>
-      <div className="h-64">
+      <div className={height}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <defs>
@@ -99,7 +102,12 @@ export default function ValuationChart({ data, metric, median, title, color }: V
                 fontSize: "13px",
               }}
               formatter={(value) => [Number(value).toFixed(2), metricLabels[metric]]}
-              labelFormatter={(label) => label}
+              labelFormatter={(_, payload) => {
+                if (payload && payload.length > 0) {
+                  return payload[0].payload.fullDate;
+                }
+                return "";
+              }}
             />
             <Legend />
             <Area
@@ -116,8 +124,8 @@ export default function ValuationChart({ data, metric, median, title, color }: V
               strokeDasharray="6 4"
               strokeWidth={1.5}
               label={{
-                value: `Median: ${median.toFixed(2)}`,
-                position: "right",
+                value: `Mdn: ${median.toFixed(2)}`,
+                position: "top",
                 fill: "#6b7280",
                 fontSize: 11,
               }}

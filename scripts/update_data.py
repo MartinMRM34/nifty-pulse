@@ -3,6 +3,11 @@ import os
 import urllib.parse
 from datetime import datetime
 from nsepython import index_info, nsefetch
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env.local
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.local'))
 
 # Define the indices we want to track and their corresponding file names
 indices = {
@@ -16,6 +21,25 @@ indices = {
 
 # The path to the data directory where JSON files are stored
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'src', 'data')
+
+# MongoDB Connection
+MONGODB_URI = os.getenv("MONGODB_URI")
+db = None
+if MONGODB_URI and "<db_password>" not in MONGODB_URI:
+    try:
+        # Escape password if it contains special characters (@, :, etc)
+        if "://" in MONGODB_URI:
+            prefix, rest = MONGODB_URI.split("://", 1)
+            userpass, host = rest.rsplit("@", 1)
+            if ":" in userpass:
+                user, password = userpass.split(":", 1)
+                MONGODB_URI = f"{prefix}://{user}:{urllib.parse.quote_plus(password)}@{host}"
+            
+        client = MongoClient(MONGODB_URI)
+        db = client.get_database("nifty-pulse")
+        print("Connected to MongoDB Atlas.")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
 
 def update_index_data(index_name, file_name):
     print(f"\nFetching data for {index_name}...")
@@ -31,44 +55,49 @@ def update_index_data(index_name, file_name):
             "dividendYield": float(info['dy'])
         }
         
+        index_id = file_name.replace('.json', '')
+        collection_name = f"history_{index_id.replace('-', '_')}"
         file_path = os.path.join(DATA_DIR, 'history', file_name)
         
-        # Read existing data
+        # Update MongoDB History
+        if db:
+            try:
+                collection = db.get_collection(collection_name)
+                collection.update_one(
+                    {'date': today_str},
+                    {'$set': new_entry},
+                    upsert=True
+                )
+                print(f"[{index_name}] MongoDB valuation updated in {collection_name}.")
+            except Exception as e:
+                print(f"[{index_name}] Failed to update MongoDB valuation: {e}")
+
+        # Update Local JSON History
         if os.path.exists(file_path):
             with open(file_path, 'r') as f:
                 history = json.load(f)
         else:
             history = []
             
-        # Append new data if not already present for today
         if not (len(history) > 0 and history[-1]['date'] == today_str):
             history.append(new_entry)
             with open(file_path, 'w') as f:
                 json.dump(history, f, indent=2)
-            print(f"[{index_name}] Successfully added valuation data for {today_str}.")
-        else:
-            print(f"[{index_name}] Valuation data for {today_str} already exists. Skipped.")
+            print(f"[{index_name}] Local JSON valuation updated.")
             
         # 2. Fetch Index Constituents
-        # The NSE API returns the index components sorted by index weight (approx free-float market cap)
-        # The URL must be properly encoded (e.g. NIFTY%2050)
         encoded_index = urllib.parse.quote(index_name)
         url = f"https://www.nseindia.com/api/equity-stockIndices?index={encoded_index}"
         
         payload = nsefetch(url)
         if payload and 'data' in payload:
             raw_constituents = payload['data']
-            # First item [0] is usually the index itself. We filter out the index object.
             stocks_only = [item for item in raw_constituents if item.get('priority', 1) == 0]
-            
-            # If filtering by priority didn't work, just slice from 1 onwards (index is usually 0)
             if not stocks_only:
                 stocks_only = raw_constituents[1:]
                 
-            all_stocks = stocks_only
-            
             structured_constituents = []
-            for s in all_stocks:
+            for s in stocks_only:
                 structured_constituents.append({
                     "symbol": s.get('symbol', ''),
                     "name": s.get('meta', {}).get('companyName', s.get('symbol', '')),
@@ -77,14 +106,26 @@ def update_index_data(index_name, file_name):
                     "pChange": s.get('pChange', 0)
                 })
                 
-            # Write constituents to JSON
+            # Update MongoDB Constituents
+            if db:
+                try:
+                    collection = db.get_collection("constituents")
+                    collection.update_one(
+                        {'index_id': index_id},
+                        {'$set': {'index_id': index_id, 'stocks': structured_constituents}},
+                        upsert=True
+                    )
+                    print(f"[{index_name}] MongoDB constituents updated.")
+                except Exception as e:
+                    print(f"[{index_name}] Failed to update MongoDB constituents: {e}")
+
+            # Update Local JSON Constituents
             const_file_name = file_name.replace('.json', '-constituents.json')
             const_file_path = os.path.join(DATA_DIR, 'constituents', const_file_name)
-            
             with open(const_file_path, 'w') as f:
                 json.dump(structured_constituents, f, indent=2)
-                
-            print(f"[{index_name}] Successfully saved all {len(all_stocks)} constituents.")
+            print(f"[{index_name}] Local JSON constituents updated.")
+
         else:
             print(f"[{index_name}] Failed to fetch constituents data payload.")
 

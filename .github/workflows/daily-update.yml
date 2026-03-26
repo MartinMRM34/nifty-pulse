@@ -23,6 +23,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Data Fetch Script
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: python scripts/update_data.py
 
       - name: Commit and Push Changes
