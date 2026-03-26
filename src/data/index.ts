@@ -72,5 +72,7 @@ async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | n
   };
 }
 
-// Cache temporarily disabled for debugging Vercel/MongoDB connection
-export const getIndexValuation = (indexId: IndexId) => fetchIndexValuation(indexId);
+// Cache temporarily disabled for debugging — must be explicitly async for "use server"
+export async function getIndexValuation(indexId: IndexId) {
+  return fetchIndexValuation(indexId);
+}
