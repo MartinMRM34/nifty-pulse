@@ -1,8 +1,18 @@
 import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
 import { nifty50History } from "./nifty-50";
+import { niftyNext50History } from "./nifty-next-50";
+import { niftyMidcap150History } from "./nifty-midcap-150";
+import { niftySmallcap250History } from "./nifty-smallcap-250";
+import { niftyLargemidcap250History } from "./nifty-largemidcap-250";
+import { nifty500History } from "./nifty-500";
 
 const dataMap: Record<string, ValuationSnapshot[]> = {
   "nifty-50": nifty50History,
+  "nifty-next-50": niftyNext50History,
+  "nifty-midcap-150": niftyMidcap150History,
+  "nifty-smallcap-250": niftySmallcap250History,
+  "nifty-largemidcap-250": niftyLargemidcap250History,
+  "nifty-500": nifty500History,
 };
 
 function computePercentile(sortedValues: number[], value: number): number {
