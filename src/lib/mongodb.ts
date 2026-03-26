@@ -6,9 +6,10 @@ if (!process.env.MONGODB_URI) {
 
 const uri = process.env.MONGODB_URI;
 const options = {
-  serverSelectionTimeoutMS: 5000,  // Fail fast in serverless
-  socketTimeoutMS: 10000,
-  connectTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 20000, // Allow time for Vercel → Atlas cross-region latency
+  socketTimeoutMS: 30000,
+  connectTimeoutMS: 20000,
+  maxPoolSize: 1, // Recommended for serverless
 };
 
 let client: MongoClient;
@@ -30,6 +31,8 @@ if (process.env.NODE_ENV === "development") {
   // In production mode, it's best to not use a global variable.
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
+  // Prevent unhandled rejection crash (exit 128). Error surfaces when getDb() is awaited.
+  clientPromise.catch((err) => console.error("[MongoDB] Initial connection error:", err.message));
 }
 
 // Export a module-scoped MongoClient promise. By doing this in a
