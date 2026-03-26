@@ -65,10 +65,10 @@ def update_index_data(index_name, file_name):
             if not stocks_only:
                 stocks_only = raw_constituents[1:]
                 
-            top_10 = stocks_only[:10]
+            all_stocks = stocks_only
             
             structured_constituents = []
-            for s in top_10:
+            for s in all_stocks:
                 structured_constituents.append({
                     "symbol": s.get('symbol', ''),
                     "name": s.get('meta', {}).get('companyName', s.get('symbol', '')),
@@ -84,7 +84,7 @@ def update_index_data(index_name, file_name):
             with open(const_file_path, 'w') as f:
                 json.dump(structured_constituents, f, indent=2)
                 
-            print(f"[{index_name}] Successfully saved top 10 constituents.")
+            print(f"[{index_name}] Successfully saved all {len(all_stocks)} constituents.")
         else:
             print(f"[{index_name}] Failed to fetch constituents data payload.")
 

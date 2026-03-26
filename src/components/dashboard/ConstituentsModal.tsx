@@ -23,7 +23,9 @@ export default function ConstituentsModal({ isOpen, onClose, indexId }: Constitu
         <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Index Constituents</h2>
-            <p className="text-sm text-gray-500">{indexMeta?.name} (Top 10)</p>
+            <p className="text-sm text-gray-500">
+              {indexMeta?.name} <span className="text-xs ml-1 bg-gray-100 px-2 py-0.5 rounded-full">{constituents.length} stocks</span>
+            </p>
           </div>
           <button
             onClick={onClose}

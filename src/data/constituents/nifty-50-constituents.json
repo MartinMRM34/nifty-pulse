@@ -68,5 +68,285 @@
     "tradedValue": 14009230561.62,
     "lastPrice": 2377.9,
     "pChange": -0.87
+  },
+  {
+    "symbol": "INFY",
+    "name": "Infosys Limited",
+    "tradedValue": 13858763291.1,
+    "lastPrice": 1278.6,
+    "pChange": 0.02
+  },
+  {
+    "symbol": "SHRIRAMFIN",
+    "name": "Shriram Finance Limited",
+    "tradedValue": 13585271820.4,
+    "lastPrice": 955.8,
+    "pChange": 5.78
+  },
+  {
+    "symbol": "AXISBANK",
+    "name": "Axis Bank Limited",
+    "tradedValue": 11819759375.58,
+    "lastPrice": 1221,
+    "pChange": 2.37
+  },
+  {
+    "symbol": "M&M",
+    "name": "Mahindra & Mahindra Limited",
+    "tradedValue": 10419079412.1,
+    "lastPrice": 3125.1,
+    "pChange": 3.09
+  },
+  {
+    "symbol": "INDIGO",
+    "name": "InterGlobe Aviation Limited",
+    "tradedValue": 9417608507.08,
+    "lastPrice": 4282.1,
+    "pChange": 3.16
+  },
+  {
+    "symbol": "ITC",
+    "name": "ITC Limited",
+    "tradedValue": 7761673516.72,
+    "lastPrice": 295.75,
+    "pChange": 1.55
+  },
+  {
+    "symbol": "TECHM",
+    "name": "Tech Mahindra Limited",
+    "tradedValue": 6987201634.88,
+    "lastPrice": 1403.5,
+    "pChange": -2.04
+  },
+  {
+    "symbol": "MARUTI",
+    "name": "Maruti Suzuki India Limited",
+    "tradedValue": 6868269733.75,
+    "lastPrice": 12701,
+    "pChange": 1.9
+  },
+  {
+    "symbol": "TATASTEEL",
+    "name": "Tata Steel Limited",
+    "tradedValue": 6798409574.4,
+    "lastPrice": 196.78,
+    "pChange": 3.14
+  },
+  {
+    "symbol": "BEL",
+    "name": "Bharat Electronics Limited",
+    "tradedValue": 6308872149.48,
+    "lastPrice": 413.3,
+    "pChange": -0.28
+  },
+  {
+    "symbol": "HCLTECH",
+    "name": "HCL Technologies Limited",
+    "tradedValue": 5766800163.25,
+    "lastPrice": 1385.6,
+    "pChange": 0.9
+  },
+  {
+    "symbol": "TITAN",
+    "name": "Titan Company Limited",
+    "tradedValue": 5275487632.24,
+    "lastPrice": 4080,
+    "pChange": 4.63
+  },
+  {
+    "symbol": "ULTRACEMCO",
+    "name": "UltraTech Cement Limited",
+    "tradedValue": 5083644681.79,
+    "lastPrice": 11200,
+    "pChange": 4.05
+  },
+  {
+    "symbol": "POWERGRID",
+    "name": "Power Grid Corporation of India Limited",
+    "tradedValue": 4893588072.36,
+    "lastPrice": 294.8,
+    "pChange": -1.4
+  },
+  {
+    "symbol": "ADANIENT",
+    "name": "Adani Enterprises Limited",
+    "tradedValue": 4789686859.8,
+    "lastPrice": 1885,
+    "pChange": 3.69
+  },
+  {
+    "symbol": "HINDUNILVR",
+    "name": "Hindustan Unilever Limited",
+    "tradedValue": 4418378367.93,
+    "lastPrice": 2136,
+    "pChange": 2.45
+  },
+  {
+    "symbol": "GRASIM",
+    "name": "Grasim Industries Limited",
+    "tradedValue": 4378468355.1,
+    "lastPrice": 2655.1,
+    "pChange": 4.15
+  },
+  {
+    "symbol": "BAJAJ-AUTO",
+    "name": "Bajaj Auto Limited",
+    "tradedValue": 3982361565.18,
+    "lastPrice": 9047.5,
+    "pChange": 1.68
+  },
+  {
+    "symbol": "HINDALCO",
+    "name": "Hindalco Industries Limited",
+    "tradedValue": 3901026932.88,
+    "lastPrice": 867.5,
+    "pChange": 1.5
+  },
+  {
+    "symbol": "COALINDIA",
+    "name": "Coal India Limited",
+    "tradedValue": 3827244891.4,
+    "lastPrice": 443.95,
+    "pChange": 0.42
+  },
+  {
+    "symbol": "TRENT",
+    "name": "Trent Limited",
+    "tradedValue": 3795865810.59,
+    "lastPrice": 3476.7,
+    "pChange": 3.3
+  },
+  {
+    "symbol": "JIOFIN",
+    "name": "Jio Financial Services Limited",
+    "tradedValue": 3744372144.04,
+    "lastPrice": 237.45,
+    "pChange": 2.04
+  },
+  {
+    "symbol": "ONGC",
+    "name": "Oil & Natural Gas Corporation Limited",
+    "tradedValue": 3609691206.25,
+    "lastPrice": 269.7,
+    "pChange": 0.62
+  },
+  {
+    "symbol": "NTPC",
+    "name": "NTPC Limited",
+    "tradedValue": 3504974949,
+    "lastPrice": 377.85,
+    "pChange": 0.61
+  },
+  {
+    "symbol": "EICHERMOT",
+    "name": "Eicher Motors Limited",
+    "tradedValue": 3442022890.5,
+    "lastPrice": 6995,
+    "pChange": 1.8
+  },
+  {
+    "symbol": "APOLLOHOSP",
+    "name": "Apollo Hospitals Enterprise Limited",
+    "tradedValue": 3402262073.98,
+    "lastPrice": 7590,
+    "pChange": 2.39
+  },
+  {
+    "symbol": "SUNPHARMA",
+    "name": "Sun Pharmaceutical Industries Limited",
+    "tradedValue": 3394152806.1,
+    "lastPrice": 1800,
+    "pChange": 2.66
+  },
+  {
+    "symbol": "BAJAJFINSV",
+    "name": "Bajaj Finserv Limited",
+    "tradedValue": 3258659318.78,
+    "lastPrice": 1749.5,
+    "pChange": 2.65
+  },
+  {
+    "symbol": "ASIANPAINT",
+    "name": "Asian Paints Limited",
+    "tradedValue": 2877546142.3,
+    "lastPrice": 2271,
+    "pChange": 2.42
+  },
+  {
+    "symbol": "MAXHEALTH",
+    "name": "Max Healthcare Institute Limited",
+    "tradedValue": 2661501514.88,
+    "lastPrice": 992.8,
+    "pChange": 2.43
+  },
+  {
+    "symbol": "WIPRO",
+    "name": "Wipro Limited",
+    "tradedValue": 2627017276,
+    "lastPrice": 189.18,
+    "pChange": 0.23
+  },
+  {
+    "symbol": "ADANIPORTS",
+    "name": "Adani Ports and Special Economic Zone Limited",
+    "tradedValue": 2564556227.47,
+    "lastPrice": 1376,
+    "pChange": 2.37
+  },
+  {
+    "symbol": "TMPV",
+    "name": "Tata Motors Passenger Vehicles Limited",
+    "tradedValue": 2507189287.56,
+    "lastPrice": 317.5,
+    "pChange": 2.02
+  },
+  {
+    "symbol": "SBILIFE",
+    "name": "SBI Life Insurance Company Limited",
+    "tradedValue": 2170079724.14,
+    "lastPrice": 1846.4,
+    "pChange": 0.57
+  },
+  {
+    "symbol": "DRREDDY",
+    "name": "Dr. Reddy's Laboratories Limited",
+    "tradedValue": 2042945481,
+    "lastPrice": 1307.9,
+    "pChange": 3.83
+  },
+  {
+    "symbol": "JSWSTEEL",
+    "name": "JSW Steel Limited",
+    "tradedValue": 1888262880.79,
+    "lastPrice": 1155,
+    "pChange": 1.88
+  },
+  {
+    "symbol": "CIPLA",
+    "name": "Cipla Limited",
+    "tradedValue": 1818668990.25,
+    "lastPrice": 1248.4,
+    "pChange": 2.38
+  },
+  {
+    "symbol": "HDFCLIFE",
+    "name": "HDFC Life Insurance Company Limited",
+    "tradedValue": 1787083751.76,
+    "lastPrice": 613,
+    "pChange": 1.66
+  },
+  {
+    "symbol": "TATACONSUM",
+    "name": "TATA CONSUMER PRODUCTS LIMITED",
+    "tradedValue": 1663676852.61,
+    "lastPrice": 1059.8,
+    "pChange": 0.64
+  },
+  {
+    "symbol": "NESTLEIND",
+    "name": "Nestle India Limited",
+    "tradedValue": 1209723845.22,
+    "lastPrice": 1203.9,
+    "pChange": 1.75
   }
 ]
