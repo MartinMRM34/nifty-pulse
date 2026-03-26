@@ -1,18 +1,18 @@
 import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
-import { nifty50History } from "./nifty-50";
-import { niftyNext50History } from "./nifty-next-50";
-import { niftyMidcap150History } from "./nifty-midcap-150";
-import { niftySmallcap250History } from "./nifty-smallcap-250";
-import { niftyLargemidcap250History } from "./nifty-largemidcap-250";
-import { nifty500History } from "./nifty-500";
+import nifty50Data from "./nifty-50.json";
+import niftyNext50Data from "./nifty-next-50.json";
+import niftyMidcap150Data from "./nifty-midcap-150.json";
+import niftySmallcap250Data from "./nifty-smallcap-250.json";
+import niftyLargemidcap250Data from "./nifty-largemidcap-250.json";
+import nifty500Data from "./nifty-500.json";
 
 const dataMap: Record<string, ValuationSnapshot[]> = {
-  "nifty-50": nifty50History,
-  "nifty-next-50": niftyNext50History,
-  "nifty-midcap-150": niftyMidcap150History,
-  "nifty-smallcap-250": niftySmallcap250History,
-  "nifty-largemidcap-250": niftyLargemidcap250History,
-  "nifty-500": nifty500History,
+  "nifty-50": nifty50Data as ValuationSnapshot[],
+  "nifty-next-50": niftyNext50Data as ValuationSnapshot[],
+  "nifty-midcap-150": niftyMidcap150Data as ValuationSnapshot[],
+  "nifty-smallcap-250": niftySmallcap250Data as ValuationSnapshot[],
+  "nifty-largemidcap-250": niftyLargemidcap250Data as ValuationSnapshot[],
+  "nifty-500": nifty500Data as ValuationSnapshot[],
 };
 
 function computePercentile(sortedValues: number[], value: number): number {

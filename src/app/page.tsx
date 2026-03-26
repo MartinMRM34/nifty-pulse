@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Activity } from "lucide-react";
+import { Activity, BellRing, List } from "lucide-react";
 import { IndexId } from "@/types";
 import { getIndexValuation } from "@/data";
 import { INDICES } from "@/lib/constants";
@@ -10,9 +10,13 @@ import MetricCard from "@/components/dashboard/MetricCard";
 import OverallSignal from "@/components/dashboard/OverallSignal";
 import StatsTable from "@/components/dashboard/StatsTable";
 import ValuationChart from "@/components/charts/ValuationChart";
+import ConstituentsModal from "@/components/dashboard/ConstituentsModal";
+import AlertModal from "@/components/dashboard/AlertModal";
 
 export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState<IndexId>("nifty-50");
+  const [isConstituentsModalOpen, setIsConstituentsModalOpen] = useState(false);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const valuation = getIndexValuation(selectedIndex);
   const indexMeta = INDICES.find((i) => i.id === selectedIndex);
 
@@ -42,14 +46,35 @@ export default function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Index Selector */}
+        {/* Index Selector and Actions */}
         <div>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">
-            {indexMeta.name}
-            <span className="text-sm font-normal text-gray-500 ml-2">
-              {indexMeta.description}
-            </span>
-          </h2>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">
+                {indexMeta.name}
+              </h2>
+              <p className="text-sm font-normal text-gray-500">
+                {indexMeta.description}
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsConstituentsModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all shadow-sm"
+              >
+                <List className="w-4 h-4" />
+                Constituents
+              </button>
+              <button
+                onClick={() => setIsAlertModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all shadow-sm"
+              >
+                <BellRing className="w-4 h-4" />
+                Set Alert
+              </button>
+            </div>
+          </div>
           <IndexSelector selected={selectedIndex} onChange={setSelectedIndex} />
         </div>
 
@@ -103,6 +128,18 @@ export default function Home() {
             Data may be delayed or approximate.
           </p>
         </footer>
+
+        {/* Modals */}
+        <ConstituentsModal
+          isOpen={isConstituentsModalOpen}
+          onClose={() => setIsConstituentsModalOpen(false)}
+          indexId={selectedIndex}
+        />
+        <AlertModal
+          isOpen={isAlertModalOpen}
+          onClose={() => setIsAlertModalOpen(false)}
+          indexId={selectedIndex}
+        />
       </main>
     </div>
   );

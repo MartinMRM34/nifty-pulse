@@ -60,26 +60,26 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
 
       {/* Zone bar */}
       <div className="mt-4">
-        <div className="flex rounded-full overflow-hidden h-3">
-          {ZONES.map((z) => (
-            <div
-              key={z.zone}
-              className="flex-1 relative"
-              style={{ backgroundColor: z.color }}
-            >
-              {overallPercentile >= z.minPercentile && overallPercentile < z.maxPercentile && (
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-800 rounded-full shadow"
-                  style={{
-                    left: `${((overallPercentile - z.minPercentile) / (z.maxPercentile - z.minPercentile)) * 100}%`,
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-              )}
-            </div>
-          ))}
+        <div className="relative h-3">
+          <div className="flex absolute inset-0 rounded-full overflow-hidden">
+            {ZONES.map((z) => (
+              <div
+                key={z.zone}
+                className="flex-1"
+                style={{ backgroundColor: z.color }}
+              />
+            ))}
+          </div>
+          {/* Indicator Dot */}
+          <div
+            className="absolute top-1/2 w-6 h-6 bg-white border-[3px] border-gray-800 rounded-full shadow-md transition-all duration-300 z-10"
+            style={{
+              left: `${Math.max(0, Math.min(100, overallPercentile))}%`,
+              transform: "translate(-50%, -50%)",
+            }}
+          />
         </div>
-        <div className="flex justify-between mt-1">
+        <div className="flex justify-between mt-3">
           <span className="text-[10px] text-gray-400">Undervalued</span>
           <span className="text-[10px] text-gray-400">Overvalued</span>
         </div>

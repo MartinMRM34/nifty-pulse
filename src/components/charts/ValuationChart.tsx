@@ -4,7 +4,6 @@ import {
   ResponsiveContainer,
   ComposedChart,
   Area,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -13,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import { ValuationSnapshot } from "@/types";
+import { useState, useMemo } from "react";
 
 interface ValuationChartProps {
   data: ValuationSnapshot[];
@@ -29,7 +29,20 @@ const metricLabels: Record<string, string> = {
 };
 
 export default function ValuationChart({ data, metric, median, title, color }: ValuationChartProps) {
-  const chartData = data.map((d) => ({
+  const [timeRange, setTimeRange] = useState<"1Y" | "5Y" | "MAX">("5Y");
+
+  const filteredData = useMemo(() => {
+    if (!data.length) return [];
+    if (timeRange === "MAX") return data;
+
+    const latestTimestamp = new Date(data[data.length - 1].date).getTime();
+    const oneYearMs = 365.25 * 24 * 60 * 60 * 1000;
+    const cutoffVal = timeRange === "1Y" ? latestTimestamp - oneYearMs : latestTimestamp - 5 * oneYearMs;
+
+    return data.filter((d) => new Date(d.date).getTime() >= cutoffVal);
+  }, [data, timeRange]);
+
+  const chartData = filteredData.map((d) => ({
     date: d.date,
     value: d[metric],
     label: new Date(d.date).toLocaleDateString("en-IN", {
@@ -39,10 +52,27 @@ export default function ValuationChart({ data, metric, median, title, color }: V
   }));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-      <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-        {title}
-      </h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col h-full">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+          {title}
+        </h3>
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          {(["1Y", "5Y", "MAX"] as const).map((range) => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                timeRange === range
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {range}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
