@@ -74,7 +74,7 @@ export default function Home() {
               <Activity className="h-6 w-6 text-blue-600" />
               <h1 className="text-xl font-bold text-gray-900">Nifty Pulse</h1>
             </div>
-            <span className="text-xs text-gray-400">
+            <span className="hidden sm:block text-xs text-gray-400">
               Market Valuation Dashboard
             </span>
           </div>

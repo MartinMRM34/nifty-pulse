@@ -56,9 +56,9 @@ export default function ValuationChart({
   }, [data, timeRange]);
 
   const chartData = filteredData.map((d) => ({
-    date: d.date,
+    date: d.date,          // raw ISO string — unique per day, used as XAxis key
     value: d[metric],
-    label: new Date(d.date).toLocaleDateString("en-IN", {
+    tickLabel: new Date(d.date).toLocaleDateString("en-IN", {
       month: "short",
       year: "numeric",
     }),
@@ -87,9 +87,12 @@ export default function ValuationChart({
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
-              dataKey="label"
+              dataKey="date"
               tick={{ fontSize: 11, fill: "#9ca3af" }}
               interval={Math.floor(chartData.length / 6)}
+              tickFormatter={(val) =>
+                new Date(val).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+              }
             />
             <YAxis
               tick={{ fontSize: 11, fill: "#9ca3af" }}
@@ -104,7 +107,7 @@ export default function ValuationChart({
               formatter={(value) => [Number(value).toFixed(2), metricLabels[metric]]}
               labelFormatter={(_, payload) => {
                 if (payload && payload.length > 0) {
-                  return payload[0].payload.fullDate;
+                  return payload[0].payload.fullDate;  // shows full day e.g. "26 Mar 2026"
                 }
                 return "";
               }}
@@ -124,7 +127,7 @@ export default function ValuationChart({
               strokeDasharray="6 4"
               strokeWidth={1.5}
               label={{
-                value: `Mdn: ${median.toFixed(2)}`,
+                value: `Median: ${median.toFixed(2)}`,
                 position: "top",
                 fill: "#6b7280",
                 fontSize: 11,
