@@ -8,6 +8,6 @@ export async function POST(req: Request) {
   if (!process.env.REVALIDATE_SECRET || secret !== process.env.REVALIDATE_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  revalidateTag("valuation");
+  revalidateTag("valuation", "max");
   return NextResponse.json({ revalidated: true, timestamp: new Date().toISOString() });
 }
