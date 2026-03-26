@@ -2,6 +2,7 @@
 
 import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
 import { getDb } from "@/lib/mongodb";
+import { unstable_cache } from "next/cache";
 
 function computePercentile(sortedValues: number[], value: number): number {
   const below = sortedValues.filter((v) => v < value).length;
@@ -72,7 +73,8 @@ async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | n
   };
 }
 
-// Cache temporarily disabled for debugging — must be explicitly async for "use server"
-export async function getIndexValuation(indexId: IndexId) {
-  return fetchIndexValuation(indexId);
-}
+export const getIndexValuation = unstable_cache(
+  async (indexId: IndexId) => fetchIndexValuation(indexId),
+  ["index-valuation"],
+  { revalidate: 3600, tags: ["valuation"] }
+);
