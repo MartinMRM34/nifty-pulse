@@ -19,9 +19,6 @@ indices = {
     "NIFTY 500": "nifty-500.json"
 }
 
-# The path to the data directory where JSON files are stored
-DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'src', 'data')
-
 # MongoDB Connection
 MONGODB_URI = os.getenv("MONGODB_URI")
 db = None
@@ -57,7 +54,6 @@ def update_index_data(index_name, file_name):
         
         index_id = file_name.replace('.json', '')
         collection_name = f"history_{index_id.replace('-', '_')}"
-        file_path = os.path.join(DATA_DIR, 'history', file_name)
         
         # Update MongoDB History
         if db:
@@ -71,19 +67,6 @@ def update_index_data(index_name, file_name):
                 print(f"[{index_name}] MongoDB valuation updated in {collection_name}.")
             except Exception as e:
                 print(f"[{index_name}] Failed to update MongoDB valuation: {e}")
-
-        # Update Local JSON History
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as f:
-                history = json.load(f)
-        else:
-            history = []
-            
-        if not (len(history) > 0 and history[-1]['date'] == today_str):
-            history.append(new_entry)
-            with open(file_path, 'w') as f:
-                json.dump(history, f, indent=2)
-            print(f"[{index_name}] Local JSON valuation updated.")
             
         # 2. Fetch Index Constituents
         encoded_index = urllib.parse.quote(index_name)
@@ -118,13 +101,6 @@ def update_index_data(index_name, file_name):
                     print(f"[{index_name}] MongoDB constituents updated.")
                 except Exception as e:
                     print(f"[{index_name}] Failed to update MongoDB constituents: {e}")
-
-            # Update Local JSON Constituents
-            const_file_name = file_name.replace('.json', '-constituents.json')
-            const_file_path = os.path.join(DATA_DIR, 'constituents', const_file_name)
-            with open(const_file_path, 'w') as f:
-                json.dump(structured_constituents, f, indent=2)
-            print(f"[{index_name}] Local JSON constituents updated.")
 
         else:
             print(f"[{index_name}] Failed to fetch constituents data payload.")
