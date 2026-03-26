@@ -1,0 +1,72 @@
+[
+  {
+    "symbol": "LODHA",
+    "name": "Lodha Developers Limited",
+    "tradedValue": 11089024191.36,
+    "lastPrice": 733.9,
+    "pChange": 1.03
+  },
+  {
+    "symbol": "VEDL",
+    "name": "Vedanta Limited",
+    "tradedValue": 8639648044.65,
+    "lastPrice": 671,
+    "pChange": 2.98
+  },
+  {
+    "symbol": "BPCL",
+    "name": "Bharat Petroleum Corporation Limited",
+    "tradedValue": 5256459046.8,
+    "lastPrice": 284.8,
+    "pChange": 0.9
+  },
+  {
+    "symbol": "ADANIPOWER",
+    "name": "Adani Power Limited",
+    "tradedValue": 5237037203.2,
+    "lastPrice": 153.9,
+    "pChange": 2.52
+  },
+  {
+    "symbol": "DMART",
+    "name": "Avenue Supermarts Limited",
+    "tradedValue": 5215109540.13,
+    "lastPrice": 3920.1,
+    "pChange": 4.36
+  },
+  {
+    "symbol": "HINDZINC",
+    "name": "Hindustan Zinc Limited",
+    "tradedValue": 4388504046,
+    "lastPrice": 518.7,
+    "pChange": 4.36
+  },
+  {
+    "symbol": "UNITDSPR",
+    "name": "United Spirits Limited",
+    "tradedValue": 4197723585.7,
+    "lastPrice": 1310.9,
+    "pChange": -1.29
+  },
+  {
+    "symbol": "HAL",
+    "name": "Hindustan Aeronautics Limited",
+    "tradedValue": 3889467426.01,
+    "lastPrice": 3669,
+    "pChange": 0.41
+  },
+  {
+    "symbol": "TVSMOTOR",
+    "name": "TVS Motor Company Limited",
+    "tradedValue": 3794816599.55,
+    "lastPrice": 3545,
+    "pChange": 1.88
+  },
+  {
+    "symbol": "PFC",
+    "name": "Power Finance Corporation Limited",
+    "tradedValue": 3782411297.04,
+    "lastPrice": 402.8,
+    "pChange": 1.02
+  }
+]

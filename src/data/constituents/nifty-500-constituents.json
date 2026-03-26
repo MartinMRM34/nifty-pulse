@@ -1,0 +1,72 @@
+[
+  {
+    "symbol": "HDFCBANK",
+    "name": "HDFC Bank Limited",
+    "tradedValue": 46508490834.4,
+    "lastPrice": 780.1,
+    "pChange": 1.99
+  },
+  {
+    "symbol": "RELIANCE",
+    "name": "Reliance Industries Limited",
+    "tradedValue": 27014888356.25,
+    "lastPrice": 1413.8,
+    "pChange": 0.14
+  },
+  {
+    "symbol": "BHARTIARTL",
+    "name": "Bharti Airtel Limited",
+    "tradedValue": 22820725955.82,
+    "lastPrice": 1834,
+    "pChange": 1.77
+  },
+  {
+    "symbol": "ICICIBANK",
+    "name": "ICICI Bank Limited",
+    "tradedValue": 21828317074.4,
+    "lastPrice": 1258.4,
+    "pChange": 0.58
+  },
+  {
+    "symbol": "GODFRYPHLP",
+    "name": "Godfrey Phillips India Limited",
+    "tradedValue": 19765829089.92,
+    "lastPrice": 2035,
+    "pChange": 7.25
+  },
+  {
+    "symbol": "LT",
+    "name": "Larsen & Toubro Limited",
+    "tradedValue": 18431937717.3,
+    "lastPrice": 3659,
+    "pChange": 4.04
+  },
+  {
+    "symbol": "PCBL",
+    "name": "PCBL Chemical Limited",
+    "tradedValue": 17679041863.83,
+    "lastPrice": 265,
+    "pChange": 13.66
+  },
+  {
+    "symbol": "SBIN",
+    "name": "State Bank of India",
+    "tradedValue": 17138760180.8,
+    "lastPrice": 1062.6,
+    "pChange": 3.08
+  },
+  {
+    "symbol": "SAMMAANCAP",
+    "name": "Sammaan Capital Limited",
+    "tradedValue": 17039800332.8,
+    "lastPrice": 146.3,
+    "pChange": 5.62
+  },
+  {
+    "symbol": "KOTAKBANK",
+    "name": "Kotak Mahindra Bank Limited",
+    "tradedValue": 15720776820.8,
+    "lastPrice": 370.4,
+    "pChange": 0.97
+  }
+]

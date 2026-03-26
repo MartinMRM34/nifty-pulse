@@ -1,0 +1,72 @@
+[
+  {
+    "symbol": "GODFRYPHLP",
+    "name": "Godfrey Phillips India Limited",
+    "tradedValue": 19765829089.92,
+    "lastPrice": 2035,
+    "pChange": 7.25
+  },
+  {
+    "symbol": "BSE",
+    "name": "BSE Limited",
+    "tradedValue": 13567695878.4,
+    "lastPrice": 2889,
+    "pChange": 2.96
+  },
+  {
+    "symbol": "DIXON",
+    "name": "Dixon Technologies (India) Limited",
+    "tradedValue": 6024549882.66,
+    "lastPrice": 10391,
+    "pChange": 2.13
+  },
+  {
+    "symbol": "SWIGGY",
+    "name": "Swiggy Limited",
+    "tradedValue": 5509226659.02,
+    "lastPrice": 276.5,
+    "pChange": 0.27
+  },
+  {
+    "symbol": "WAAREEENER",
+    "name": "Waaree Energies Limited",
+    "tradedValue": 5318636910.4,
+    "lastPrice": 3178,
+    "pChange": 2.96
+  },
+  {
+    "symbol": "COFORGE",
+    "name": "Coforge Limited",
+    "tradedValue": 5121988165.4,
+    "lastPrice": 1162,
+    "pChange": 4.68
+  },
+  {
+    "symbol": "HINDPETRO",
+    "name": "Hindustan Petroleum Corporation Limited",
+    "tradedValue": 4513892730.27,
+    "lastPrice": 345.3,
+    "pChange": 2.52
+  },
+  {
+    "symbol": "IDEA",
+    "name": "Vodafone Idea Limited",
+    "tradedValue": 3981212711.64,
+    "lastPrice": 9.04,
+    "pChange": 1.8
+  },
+  {
+    "symbol": "PERSISTENT",
+    "name": "Persistent Systems Limited",
+    "tradedValue": 3851032784.34,
+    "lastPrice": 4926,
+    "pChange": 0.25
+  },
+  {
+    "symbol": "MUTHOOTFIN",
+    "name": "Muthoot Finance Limited",
+    "tradedValue": 3549330295.84,
+    "lastPrice": 3312.8,
+    "pChange": 4.99
+  }
+]

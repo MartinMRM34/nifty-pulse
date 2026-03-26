@@ -1,10 +1,10 @@
 import { IndexId, IndexValuation, ValuationSnapshot, ValuationStats } from "@/types";
-import nifty50Data from "./nifty-50.json";
-import niftyNext50Data from "./nifty-next-50.json";
-import niftyMidcap150Data from "./nifty-midcap-150.json";
-import niftySmallcap250Data from "./nifty-smallcap-250.json";
-import niftyLargemidcap250Data from "./nifty-largemidcap-250.json";
-import nifty500Data from "./nifty-500.json";
+import nifty50Data from "./history/nifty-50.json";
+import niftyNext50Data from "./history/nifty-next-50.json";
+import niftyMidcap150Data from "./history/nifty-midcap-150.json";
+import niftySmallcap250Data from "./history/nifty-smallcap-250.json";
+import niftyLargemidcap250Data from "./history/nifty-largemidcap-250.json";
+import nifty500Data from "./history/nifty-500.json";
 
 const dataMap: Record<string, ValuationSnapshot[]> = {
   "nifty-50": nifty50Data as ValuationSnapshot[],

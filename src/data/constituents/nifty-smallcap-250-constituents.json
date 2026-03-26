@@ -1,0 +1,72 @@
+[
+  {
+    "symbol": "PCBL",
+    "name": "PCBL Chemical Limited",
+    "tradedValue": 17679041863.83,
+    "lastPrice": 265,
+    "pChange": 13.66
+  },
+  {
+    "symbol": "SAMMAANCAP",
+    "name": "Sammaan Capital Limited",
+    "tradedValue": 17039800332.8,
+    "lastPrice": 146.3,
+    "pChange": 5.62
+  },
+  {
+    "symbol": "KAYNES",
+    "name": "Kaynes Technology India Limited",
+    "tradedValue": 10671031350,
+    "lastPrice": 3710.3,
+    "pChange": 5.58
+  },
+  {
+    "symbol": "BLS",
+    "name": "BLS International Services Limited",
+    "tradedValue": 9118437708.24,
+    "lastPrice": 260.7,
+    "pChange": 0.5
+  },
+  {
+    "symbol": "MCX",
+    "name": "Multi Commodity Exchange of India Limited",
+    "tradedValue": 8414776903.05,
+    "lastPrice": 2456,
+    "pChange": 1.53
+  },
+  {
+    "symbol": "DEEPAKFERT",
+    "name": "Deepak Fertilizers and Petrochemicals Corporation Limited",
+    "tradedValue": 6871651221.22,
+    "lastPrice": 996,
+    "pChange": 8.14
+  },
+  {
+    "symbol": "TRIVENI",
+    "name": "Triveni Engineering & Industries Limited",
+    "tradedValue": 6432623410.83,
+    "lastPrice": 400.05,
+    "pChange": 8.03
+  },
+  {
+    "symbol": "HINDCOPPER",
+    "name": "Hindustan Copper Limited",
+    "tradedValue": 4793875605.6,
+    "lastPrice": 480.55,
+    "pChange": 3.67
+  },
+  {
+    "symbol": "PGEL",
+    "name": "PG Electroplast Limited",
+    "tradedValue": 4228519665.78,
+    "lastPrice": 516.1,
+    "pChange": 2.87
+  },
+  {
+    "symbol": "NETWEB",
+    "name": "Netweb Technologies India Limited",
+    "tradedValue": 3712488661.17,
+    "lastPrice": 3256,
+    "pChange": 1.78
+  }
+]
