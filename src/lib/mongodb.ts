@@ -6,40 +6,30 @@ if (!process.env.MONGODB_URI) {
 
 const uri = process.env.MONGODB_URI;
 const options = {
-  serverSelectionTimeoutMS: 20000, // Allow time for Vercel → Atlas cross-region latency
+  serverSelectionTimeoutMS: 20000,
   socketTimeoutMS: 30000,
   connectTimeoutMS: 20000,
   maxPoolSize: 1, // Recommended for serverless
 };
 
 let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
 
 if (process.env.NODE_ENV === "development") {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>;
+  // In development, reuse client across HMR reloads
+  const globalWithMongo = global as typeof globalThis & {
+    _mongoClient?: MongoClient;
   };
-
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    globalWithMongo._mongoClientPromise = client.connect();
+  if (!globalWithMongo._mongoClient) {
+    globalWithMongo._mongoClient = new MongoClient(uri, options);
   }
-  clientPromise = globalWithMongo._mongoClientPromise;
+  client = globalWithMongo._mongoClient;
 } else {
-  // In production mode, it's best to not use a global variable.
+  // In production, create a new client per module instance (serverless-safe)
   client = new MongoClient(uri, options);
-  clientPromise = client.connect();
-  // Prevent unhandled rejection crash (exit 128). Error surfaces when getDb() is awaited.
-  clientPromise.catch((err) => console.error("[MongoDB] Initial connection error:", err.message));
 }
 
-// Export a module-scoped MongoClient promise. By doing this in a
-// separate module, the client can be shared across functions.
-export default clientPromise;
-
+// Lazy connection: the driver auto-connects on first operation.
+// No module-level connect() call = no background timeout crash on cold start.
 export async function getDb(): Promise<Db> {
-  const client = await clientPromise;
   return client.db(process.env.MONGODB_DB || "nifty-pulse");
 }
