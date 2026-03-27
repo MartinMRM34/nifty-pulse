@@ -1,5 +1,2 @@
-nsepython
-pandas
-requests
 pymongo
 python-dotenv

@@ -1,124 +1,162 @@
-import json
+"""
+update_data.py
+--------------
+Fetches daily P/E, P/B, and Dividend Yield for Nifty indices from the
+NSE Archives CSV (archives.nseindia.com) — publicly accessible from
+any IP including GitHub Actions runners.
+
+Writes results to MongoDB Atlas.
+"""
+
+import io
 import os
+import csv
 import urllib.parse
-from datetime import datetime
-from nsepython import nsefetch
+import urllib.request
+from datetime import date
+from typing import Optional
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
-# Load environment variables from .env.local
-load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.local'))
+# ---------------------------------------------------------------------------
+# Environment
+# ---------------------------------------------------------------------------
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 
-# Define the indices we want to track and their corresponding file names
-indices = {
-    "NIFTY 50": "nifty-50.json",
-    "NIFTY NEXT 50": "nifty-next-50.json",
-    "NIFTY MIDCAP 150": "nifty-midcap-150.json",
-    "NIFTY SMALLCAP 250": "nifty-smallcap-250.json",
-    "NIFTY LARGEMIDCAP 250": "nifty-largemidcap-250.json",
-    "NIFTY 500": "nifty-500.json"
+# ---------------------------------------------------------------------------
+# Index map: NSE CSV "Index Name" field → MongoDB collection slug
+# ---------------------------------------------------------------------------
+INDEX_MAP = {
+    "Nifty 50":               "nifty-50",
+    "Nifty Next 50":          "nifty-next-50",
+    "Nifty Midcap 150":       "nifty-midcap-150",
+    "Nifty Smallcap 250":     "nifty-smallcap-250",
+    "NIFTY LargeMidcap 250":  "nifty-largemidcap-250",
+    "Nifty 500":              "nifty-500",
 }
 
-# MongoDB Connection
-MONGODB_URI = os.getenv("MONGODB_URI")
+# ---------------------------------------------------------------------------
+# MongoDB connection — FIX: use `is not None` (Database objects aren't booleans)
+# ---------------------------------------------------------------------------
+MONGODB_URI = os.getenv("MONGODB_URI", "")
 db = None
+
 if MONGODB_URI and "<db_password>" not in MONGODB_URI:
     try:
-        # Escape password if it contains special characters (@, :, etc)
         if "://" in MONGODB_URI:
             prefix, rest = MONGODB_URI.split("://", 1)
             userpass, host = rest.rsplit("@", 1)
             if ":" in userpass:
                 user, password = userpass.split(":", 1)
                 MONGODB_URI = f"{prefix}://{user}:{urllib.parse.quote_plus(password)}@{host}"
-            
-        client = MongoClient(MONGODB_URI)
+
+        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=10_000)
+        client.admin.command("ping")          # verify connection before continuing
         db = client.get_database("nifty-pulse")
         print("Connected to MongoDB Atlas.")
-    except Exception as e:
-        print(f"Failed to connect to MongoDB: {e}")
+    except Exception as exc:
+        print(f"MongoDB connection failed: {exc}")
+else:
+    print("No valid MONGODB_URI — skipping DB writes.")
 
-def update_index_data(index_name, file_name):
-    print(f"\nFetching data for {index_name}...")
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+def safe_float(val: str, default: float = 0.0) -> float:
     try:
-        # 1. Fetch data from NSE (contains both valuation and constituents)
-        encoded_index = urllib.parse.quote(index_name)
-        url = f"https://www.nseindia.com/api/equity-stockIndices?index={encoded_index}"
-        
-        payload = nsefetch(url)
-        if not payload or 'data' not in payload:
-            print(f"[{index_name}] Failed to fetch data payload.")
-            return
+        cleaned = str(val).strip().replace(",", "")
+        if cleaned in ("-", "", "nan", "N/A"):
+            return default
+        return round(float(cleaned), 4)
+    except Exception:
+        return default
 
-        today_str = datetime.now().strftime("%Y-%m-%d")
-        
-        # 2. Extract Valuation Metrics (from the first item in data array which is the index itself)
-        index_data = payload['data'][0]
-        
-        # Some NSE API responses might have 'pe', 'pb', 'dy' as strings or N/A
-        def safe_float(val, default=0.0):
-            try:
-                if val == "-" or val is None: return default
-                return float(str(val).replace(',', ''))
-            except:
-                return default
+
+def build_nse_csv_url(for_date: date) -> str:
+    """
+    NSE Archives daily index CSV URL format:
+    https://archives.nseindia.com/content/indices/ind_close_all_DDMMYYYY.csv
+    """
+    date_str = for_date.strftime("%d%m%Y")
+    return f"https://archives.nseindia.com/content/indices/ind_close_all_{date_str}.csv"
+
+
+def fetch_nse_csv(for_date: date) -> list[dict]:
+    """Download and parse the NSE daily index CSV. Returns list of row dicts."""
+    url = build_nse_csv_url(for_date)
+    print(f"Fetching NSE CSV: {url}")
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            )
+        },
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        content = resp.read().decode("utf-8", errors="replace")
+
+    reader = csv.DictReader(io.StringIO(content))
+    return list(reader)
+
+
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
+def update_all_indices(today: Optional[date] = None):
+    if today is None:
+        today = date.today()
+
+    today_str = today.strftime("%Y-%m-%d")
+
+    try:
+        rows = fetch_nse_csv(today)
+    except Exception as exc:
+        print(f"Failed to fetch NSE CSV: {exc}")
+        return
+
+    # Build a lookup: stripped index name → row
+    row_lookup = {r["Index Name"].strip(): r for r in rows}
+
+    for nse_name, index_id in INDEX_MAP.items():
+        row = row_lookup.get(nse_name)
+        if row is None:
+            print(f"\n[{nse_name}] Not found in today's CSV — skipping.")
+            continue
+
+        pe  = safe_float(row.get("P/E", ""))
+        pb  = safe_float(row.get("P/B", ""))
+        dy  = safe_float(row.get("Div Yield", ""))
 
         new_entry = {
-            "date": today_str,
-            "pe": safe_float(index_data.get('pe')),
-            "pb": safe_float(index_data.get('pb')),
-            "dividendYield": safe_float(index_data.get('dy'))
+            "date":          today_str,
+            "pe":            pe,
+            "pb":            pb,
+            "dividendYield": dy,
         }
-        
-        print(f"[{index_name}] Today's Metrics: PE={new_entry['pe']}, PB={new_entry['pb']}, DY={new_entry['dividendYield']}")
 
-        index_id = file_name.replace('.json', '')
-        collection_name = f"history_{index_id.replace('-', '_')}"
-        
-        # Update MongoDB History
-        if db:
+        print(f"\n[{nse_name}] PE={pe}, PB={pb}, DY={dy}")
+
+        # FIX: `db is not None` — not just `db` (avoids TypeError on MongoDB objects)
+        if db is not None:
+            collection_name = f"history_{index_id.replace('-', '_')}"
             try:
-                collection = db.get_collection(collection_name)
-                collection.update_one(
-                    {'date': today_str},
-                    {'$set': new_entry},
-                    upsert=True
+                col = db.get_collection(collection_name)
+                col.update_one(
+                    {"date": today_str},
+                    {"$set": new_entry},
+                    upsert=True,
                 )
-                print(f"[{index_name}] MongoDB valuation updated in {collection_name}.")
-            except Exception as e:
-                print(f"[{index_name}] Failed to update MongoDB valuation: {e}")
-            
-        # 3. Extract Index Constituents
-        raw_constituents = payload['data']
-        # Skip the first element as it's the index itself
-        stocks_only = raw_constituents[1:]
-            
-        structured_constituents = []
-        for s in stocks_only:
-            structured_constituents.append({
-                "symbol": s.get('symbol', ''),
-                "name": s.get('meta', {}).get('companyName', s.get('symbol', '')),
-                "tradedValue": s.get('totalTradedValue', 0),
-                "lastPrice": s.get('lastPrice', 0),
-                "pChange": s.get('pChange', 0)
-            })
-            
-        # Update MongoDB Constituents
-        if db:
-            try:
-                collection = db.get_collection("constituents")
-                collection.update_one(
-                    {'index_id': index_id},
-                    {'$set': {'index_id': index_id, 'stocks': structured_constituents}},
-                    upsert=True
-                )
-                print(f"[{index_name}] MongoDB constituents updated.")
-            except Exception as e:
-                print(f"[{index_name}] Failed to update MongoDB constituents: {e}")
+                print(f"  → Written to MongoDB collection '{collection_name}'")
+            except Exception as exc:
+                print(f"  → MongoDB write failed: {exc}")
 
-    except Exception as e:
-        print(f"Failed to fetch or save data for {index_name}: {e}")
 
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    for name, filename in indices.items():
-        update_index_data(name, filename)
+    update_all_indices()
