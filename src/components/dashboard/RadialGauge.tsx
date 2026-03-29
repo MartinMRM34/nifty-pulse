@@ -78,8 +78,8 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
             x={cx}
             y={cy - (size * 0.05)}
             textAnchor="middle"
-            className="font-bold fill-gray-900 dark:fill-gray-100"
-            style={{ fontSize: `${size * 0.09}px` }}
+            className="font-black fill-foreground transition-colors"
+            style={{ fontSize: `${size * 0.095}px`, letterSpacing: "-0.02em" }}
           >
             {value}
           </text>
@@ -91,30 +91,30 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
           y1={cy}
           x2={needleX}
           y2={needleY}
-          stroke="#1f2937"
-          strokeWidth={size * 0.012}
+          stroke="currentColor"
+          strokeWidth={size * 0.015}
           strokeLinecap="round"
-          className="transition-all duration-700 ease-out dark:stroke-gray-400"
+          className="text-slate-800 dark:text-slate-400 transition-all duration-1000 ease-out"
         />
 
         {/* Center circle */}
-        <circle cx={cx} cy={cy} r={size * 0.03} fill="#1f2937" className="dark:fill-gray-600" />
-        <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-gray-100" />
+        <circle cx={cx} cy={cy} r={size * 0.035} fill="currentColor" className="text-slate-800 dark:text-slate-400" />
+        <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-slate-100 shadow-sm" />
 
       </svg>
 
       {/* Signal label and action */}
       <div className="text-center -mt-2">
         <span
-          className="inline-block px-4 py-1.5 rounded-full text-sm font-bold text-white"
+          className="inline-block px-5 py-2 rounded-full text-[11px] font-black text-white uppercase tracking-wider shadow-lg shadow-current/20 border border-white/10"
           style={{ backgroundColor: signalColor }}
         >
           {signal.label}
         </span>
-        <p className="text-sm text-gray-500 mt-2 font-medium">
+        <p className="text-sm text-foreground mt-3 font-bold">
           {signal.recommendedAction}
         </p>
-        <p className="text-[10px] text-gray-400 mt-1">
+        <p className="text-[10px] text-muted mt-1 font-medium opacity-60">
           {percentile}th percentile
         </p>
       </div>

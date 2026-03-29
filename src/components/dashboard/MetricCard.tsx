@@ -20,74 +20,84 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
   const TrendIcon = Math.abs(diffFromMedian) < 0.1 ? Minus : isAboveMedian ? TrendingUp : TrendingDown;
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{title}</h3>
+        <h3 className="text-xs font-bold text-muted uppercase tracking-wider">{title}</h3>
         <span
-          className={`px-2.5 py-1 rounded-full text-xs font-semibold ${zone.bgColor} ${zone.textColor}`}
+          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${zone.bgColor} ${zone.textColor} border border-black/5 dark:border-white/5`}
         >
           {zone.label}
         </span>
       </div>
 
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+        <span className="text-3xl font-black text-foreground tracking-tight">
           {stats.current.toFixed(2)}
         </span>
-        <span className="text-sm text-gray-400">{unit}</span>
+        <span className="text-sm font-bold text-muted opacity-50">{unit}</span>
       </div>
 
-      <div className="flex items-center gap-1 mb-4">
-        <TrendIcon
-          size={16}
-          className={
-            Math.abs(diffFromMedian) < 0.1
-              ? "text-gray-400"
-              : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
-                ? "text-red-500"
-                : "text-green-500"
-          }
-        />
+      <div className="flex items-center gap-1.5 mb-5">
+        <div className={`p-1 rounded-md ${Math.abs(diffFromMedian) < 0.1
+          ? "bg-gray-100 dark:bg-gray-800"
+          : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
+            ? "bg-rose-50 dark:bg-rose-900/20"
+            : "bg-emerald-50 dark:bg-emerald-900/20"
+          }`}>
+          <TrendIcon
+            size={14}
+            strokeWidth={3}
+            className={
+              Math.abs(diffFromMedian) < 0.1
+                ? "text-muted"
+                : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
+                  ? "text-rose-500"
+                  : "text-emerald-500"
+            }
+          />
+        </div>
         <span
-          className={`text-sm font-medium ${Math.abs(diffFromMedian) < 0.1
-              ? "text-gray-400"
-              : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
-                ? "text-red-500"
-                : "text-green-500"
+          className={`text-sm font-bold ${Math.abs(diffFromMedian) < 0.1
+            ? "text-muted"
+            : (isAboveMedian && !invertedSignal) || (!isAboveMedian && invertedSignal)
+              ? "text-rose-500"
+              : "text-emerald-500"
             }`}
         >
           {isAboveMedian ? "+" : ""}
-          {diffPercent}% vs median
+          {diffPercent}%
+          <span className="ml-1 text-[10px] text-muted font-medium opacity-60 italic whitespace-nowrap">vs median</span>
         </span>
       </div>
 
-      <div className="space-y-2 text-sm">
-        <div className="flex justify-between text-gray-500 dark:text-gray-400">
+      <div className="space-y-2.5 text-xs">
+        <div className="flex justify-between items-center text-muted font-medium">
           <span>Median</span>
-          <span className="font-medium text-gray-700 dark:text-gray-300">{stats.median.toFixed(2)}</span>
+          <span className="font-bold text-foreground bg-background px-2 py-0.5 rounded border border-border">{stats.median.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-gray-500 dark:text-gray-400">
+        <div className="flex justify-between items-center text-muted font-medium">
           <span>Mean</span>
-          <span className="font-medium text-gray-700 dark:text-gray-300">{stats.mean.toFixed(2)}</span>
+          <span className="font-bold text-foreground">{stats.mean.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-gray-500 dark:text-gray-400">
+        <div className="flex justify-between items-center text-muted font-medium">
           <span>Range</span>
-          <span className="font-medium text-gray-700 dark:text-gray-300">
+          <span className="font-bold text-foreground">
             {stats.min.toFixed(2)} - {stats.max.toFixed(2)}
           </span>
         </div>
         {/* Percentile bar */}
-        <div className="pt-2">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>Percentile</span>
-            <span>{stats.percentile}th</span>
+        <div className="pt-3">
+          <div className="flex justify-between text-[10px] font-bold text-muted uppercase tracking-wider mb-1.5">
+            <span>Market Percentile</span>
+            <span className="text-foreground">{stats.percentile}th</span>
           </div>
-          <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
+          <div className="w-full bg-background rounded-full h-1.5 border border-border/50">
             <div
-              className="h-2 rounded-full transition-all duration-500"
+              className="h-1.5 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px] shadow-current"
               style={{
                 width: `${stats.percentile}%`,
                 backgroundColor: zone.color,
+                color: zone.color, // used for shadow-current
               }}
             />
           </div>

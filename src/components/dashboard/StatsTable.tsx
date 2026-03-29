@@ -27,40 +27,40 @@ export default function StatsTable({ valuation }: StatsTableProps) {
   ];
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-4 sm:p-6 shadow-sm h-full">
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">
+    <div className="bg-card rounded-2xl border border-border/50 p-4 sm:p-6 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 h-full group">
+      <h3 className="text-[10px] font-black text-muted uppercase tracking-widest mb-6 opacity-60">
         Valuation Summary
       </h3>
 
       {/* Desktop table — hidden on mobile */}
       <div className="hidden sm:block overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800">
-              <th className="text-left py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Metric</th>
-              <th className="text-right py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Current</th>
-              <th className="text-right py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Median</th>
-              <th className="text-right py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Min</th>
-              <th className="text-right py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Max</th>
-              <th className="text-right py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Pct.</th>
-              <th className="text-center py-3 px-2 text-gray-500 dark:text-gray-400 font-medium">Zone</th>
+            <tr className="border-b border-border">
+              <th className="text-left py-4 px-2 text-muted font-black uppercase tracking-wider">Metric</th>
+              <th className="text-right py-4 px-2 text-muted font-black uppercase tracking-wider">Current</th>
+              <th className="text-right py-4 px-2 text-muted font-black uppercase tracking-wider">Median</th>
+              <th className="text-right py-4 px-2 text-muted font-black uppercase tracking-wider">Min</th>
+              <th className="text-right py-4 px-2 text-muted font-black uppercase tracking-wider">Max</th>
+              <th className="text-right py-4 px-2 text-muted font-black uppercase tracking-wider">Pct.</th>
+              <th className="text-center py-4 px-2 text-muted font-black uppercase tracking-wider">Zone</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-border/50">
             {metrics.map((m) => {
               const zone = getZone(m.inverted ? 100 - m.stats.percentile : m.stats.percentile);
               return (
-                <tr key={m.name} className="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-900/50">
-                  <td className="py-3 px-2 font-medium text-gray-700 dark:text-gray-300">{m.name}</td>
-                  <td className="py-3 px-2 text-right font-semibold text-gray-900 dark:text-white">
+                <tr key={m.name} className="group hover:bg-background transition-colors">
+                  <td className="py-4 px-2 font-bold text-foreground">{m.name}</td>
+                  <td className="py-4 px-2 text-right font-black text-foreground">
                     {m.stats.current.toFixed(2)}
                   </td>
-                  <td className="py-3 px-2 text-right text-gray-600 dark:text-gray-400">{m.stats.median.toFixed(2)}</td>
-                  <td className="py-3 px-2 text-right text-gray-600 dark:text-gray-400">{m.stats.min.toFixed(2)}</td>
-                  <td className="py-3 px-2 text-right text-gray-600 dark:text-gray-400">{m.stats.max.toFixed(2)}</td>
-                  <td className="py-3 px-2 text-right text-gray-600 dark:text-gray-400">{m.stats.percentile}th</td>
-                  <td className="py-3 px-2 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${zone.bgColor} ${zone.textColor}`}>
+                  <td className="py-4 px-2 text-right text-muted font-bold opacity-80">{m.stats.median.toFixed(2)}</td>
+                  <td className="py-4 px-2 text-right text-muted font-bold opacity-60">{m.stats.min.toFixed(2)}</td>
+                  <td className="py-4 px-2 text-right text-muted font-bold opacity-60">{m.stats.max.toFixed(2)}</td>
+                  <td className="py-4 px-2 text-right text-foreground font-black tracking-tight">{m.stats.percentile}th</td>
+                  <td className="py-4 px-2 text-center">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${zone.bgColor} ${zone.textColor} border border-black/5 dark:border-white/5`}>
                       {zone.label}
                     </span>
                   </td>
@@ -72,44 +72,44 @@ export default function StatsTable({ valuation }: StatsTableProps) {
       </div>
 
       {/* Mobile card layout — visible only on small screens */}
-      <div className="sm:hidden space-y-3">
+      <div className="sm:hidden space-y-4">
         {metrics.map((m) => {
           const zone = getZone(m.inverted ? 100 - m.stats.percentile : m.stats.percentile);
           return (
-            <div key={m.name} className="rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">{m.name}</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${zone.bgColor} ${zone.textColor}`}>
+            <div key={m.name} className="rounded-xl border border-border bg-background/50 p-4 transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-black text-foreground uppercase tracking-widest">{m.name}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${zone.bgColor} ${zone.textColor} border border-black/5 dark:border-white/5`}>
                   {zone.label}
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-1 text-xs text-gray-500 dark:text-gray-400">
+              <div className="grid grid-cols-4 gap-2 text-[10px] text-muted font-bold uppercase tracking-tighter">
                 <div>
-                  <div className="font-medium text-gray-900 dark:text-white text-sm">{m.stats.current.toFixed(2)}</div>
-                  <div>Current</div>
+                  <div className="font-black text-foreground text-sm tracking-tight mb-0.5">{m.stats.current.toFixed(2)}</div>
+                  <div className="opacity-50">Current</div>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-700 dark:text-gray-300">{m.stats.median.toFixed(2)}</div>
-                  <div>Median</div>
+                  <div className="font-black text-muted text-sm tracking-tight mb-0.5">{m.stats.median.toFixed(2)}</div>
+                  <div className="opacity-50">Median</div>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-700 dark:text-gray-300">{m.stats.min.toFixed(2)}</div>
-                  <div>Min</div>
+                  <div className="font-black text-muted text-sm tracking-tight mb-0.5 opacity-60">{m.stats.min.toFixed(2)}</div>
+                  <div className="opacity-30">Min</div>
                 </div>
                 <div>
-                  <div className="font-medium text-gray-700 dark:text-gray-300">{m.stats.max.toFixed(2)}</div>
-                  <div>Max</div>
+                  <div className="font-black text-muted text-sm tracking-tight mb-0.5 opacity-60">{m.stats.max.toFixed(2)}</div>
+                  <div className="opacity-30">Max</div>
                 </div>
               </div>
               {/* Percentile bar */}
-              <div className="mt-2">
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <div className="mt-4">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-1.5 opacity-60">
                   <span>Percentile</span>
-                  <span className="font-medium text-gray-600 dark:text-gray-300">{m.stats.percentile}th</span>
+                  <span className="text-foreground">{m.stats.percentile}th</span>
                 </div>
-                <div className="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full">
+                <div className="h-1 bg-border rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all"
+                    className="h-full rounded-full transition-all duration-700 ease-out"
                     style={{
                       width: `${m.stats.percentile}%`,
                       backgroundColor: zone.color ?? "#6b7280",

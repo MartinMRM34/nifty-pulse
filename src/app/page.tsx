@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Activity, BellRing, List, Sun, Moon } from "lucide-react";
+import { Activity, BellRing, List, Sun, Moon, SunMoon } from "lucide-react";
 import { IndexId, IndexValuation, TacticalSignal } from "@/types";
 import { getIndexValuation } from "@/data";
 import { INDICES } from "@/lib/constants";
@@ -28,32 +28,68 @@ const ValuationChart = dynamic(() => import("@/components/charts/ValuationChart"
 
 export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState<IndexId>("nifty-50");
-  const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y" | "MAX">("5Y");
+  const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y" | "MAX">("3Y");
   const [valuation, setValuation] = useState<IndexValuation | null>(null);
   const [signal, setSignal] = useState<TacticalSignal | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [themeMode, setThemeMode] = useState<"light" | "dark" | "auto">("auto");
+  const [effectiveTheme, setEffectiveTheme] = useState<"light" | "dark">("light");
 
   const [isConstituentsModalOpen, setIsConstituentsModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const indexMeta = INDICES.find((i) => i.id === selectedIndex);
 
-  // Dark mode toggle
-  useEffect(() => {
-    const stored = localStorage.getItem("niftypulse-theme");
-    if (stored === "dark") {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
+  // Dark mode logic
+  const isNightTime = useCallback(() => {
+    const hour = new Date().getHours();
+    const minutes = new Date().getMinutes();
+    const currentTime = hour + minutes / 60;
+    // Night is 6:30 PM to 6:30 AM local time
+    return currentTime >= 18.5 || currentTime < 6.5;
   }, []);
 
-  function toggleDarkMode() {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("niftypulse-theme", next ? "dark" : "light");
+  const updateEffectiveTheme = useCallback(() => {
+    const stored = localStorage.getItem("niftypulse-theme-mode") as any;
+    const mode = stored || "auto";
+    setThemeMode(mode);
+
+    let effective: "light" | "dark" = "light";
+    if (mode === "auto") {
+      effective = isNightTime() ? "dark" : "light";
+    } else {
+      effective = mode;
+    }
+
+    setEffectiveTheme(effective);
+    document.documentElement.classList.toggle("dark", effective === "dark");
+  }, [isNightTime]);
+
+  useEffect(() => {
+    updateEffectiveTheme();
+
+    // Re-check every minute for auto-switching
+    const timer = setInterval(updateEffectiveTheme, 60000);
+    return () => clearInterval(timer);
+  }, [updateEffectiveTheme]);
+
+  function cycleThemeMode() {
+    const modes: ("light" | "dark" | "auto")[] = ["auto", "light", "dark"];
+    const nextIdx = (modes.indexOf(themeMode) + 1) % modes.length;
+    const nextMode = modes[nextIdx];
+
+    setThemeMode(nextMode);
+    localStorage.setItem("niftypulse-theme-mode", nextMode);
+
+    let effective: "light" | "dark" = "light";
+    if (nextMode === "auto") {
+      effective = isNightTime() ? "dark" : "light";
+    } else {
+      effective = nextMode;
+    }
+    setEffectiveTheme(effective);
+    document.documentElement.classList.toggle("dark", effective === "dark");
   }
 
   // Data loading
@@ -131,29 +167,47 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
+      <header className="bg-card border-b border-border sticky top-0 z-20 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
               <Activity className="h-5 w-5 text-emerald-500" />
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">Nifty Pulse</h1>
-              <span className="hidden sm:block text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+              <h1 className="text-lg font-bold text-foreground">Nifty Pulse</h1>
+              <span className="hidden sm:block text-[10px] text-muted font-medium uppercase tracking-wider">
                 v2.0
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <VoiceTrigger
                 onIndexChange={setSelectedIndex}
                 onReadThirukkural={handleReadThirukkural}
                 onReadSignal={handleReadSignal}
               />
-              <button
-                onClick={toggleDarkMode}
-                className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
+              <div className="flex items-center bg-background border border-border rounded-full p-1 shadow-sm">
+                <button
+                  onClick={cycleThemeMode}
+                  className={`p-1.5 rounded-full transition-all group relative ${
+                    themeMode === "auto" ? "text-blue-500" : "text-muted hover:text-foreground"
+                  }`}
+                  title={`Mode: ${themeMode.toUpperCase()} (Click to cycle)`}
+                >
+                  <div className="relative">
+                    {themeMode === "auto" ? (
+                      <SunMoon className="w-4 h-4" />
+                    ) : themeMode === "dark" ? (
+                      <Moon className="w-4 h-4" />
+                    ) : (
+                      <Sun className="w-4 h-4" />
+                    )}
+                    {themeMode === "auto" && (
+                      <div className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600 text-[6px] font-black text-white items-center justify-center border border-white/20">A</span>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -162,10 +216,10 @@ export default function Home() {
       <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 transition-opacity duration-300 ${isFetching ? 'opacity-60 cursor-wait' : 'opacity-100'}`}>
         {/* Loading Overlay */}
         {isFetching && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 dark:bg-black/30 backdrop-blur-[1px] pointer-events-none">
-            <div className="bg-white/80 dark:bg-gray-900/80 p-4 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700 flex items-center gap-3">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/30 backdrop-blur-[1px] pointer-events-none">
+            <div className="bg-card/80 p-4 rounded-2xl shadow-lg border border-blue-100 dark:border-border flex items-center gap-3">
               <Activity className="h-5 w-5 text-emerald-500 animate-pulse" />
-              <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Updating...</span>
+              <span className="text-sm font-bold text-foreground">Updating...</span>
             </div>
           </div>
         )}
@@ -175,14 +229,14 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 whitespace-nowrap">
+                <h2 className="text-lg font-bold text-foreground whitespace-nowrap">
                   {indexMeta.name}
                 </h2>
-                <p className="hidden sm:block text-[10px] font-normal text-gray-500 dark:text-gray-400 max-w-[200px] truncate">
+                <p className="hidden sm:block text-[10px] font-medium text-muted max-w-[200px] truncate">
                   {indexMeta.description}
                 </p>
               </div>
-              <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-800 hidden md:block" />
+              <div className="h-6 w-[1px] bg-border hidden md:block" />
               <div className="flex-1">
                 <IndexChips selected={selectedIndex} onChange={setSelectedIndex} />
               </div>
@@ -191,16 +245,16 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setIsConstituentsModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-xs font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-card text-foreground border border-border hover:border-blue-400 hover:text-blue-500 rounded-xl text-xs font-semibold transition-all shadow-sm group"
               >
-                <List className="w-4 h-4" />
+                <List className="w-4 h-4 text-muted group-hover:text-blue-500" />
                 Constituents
               </button>
               <button
                 onClick={() => setIsAlertModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-xs font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-card text-foreground border border-border hover:border-blue-400 hover:text-blue-500 rounded-xl text-xs font-semibold transition-all shadow-sm group"
               >
-                <BellRing className="w-4 h-4" />
+                <BellRing className="w-4 h-4 text-muted group-hover:text-blue-500" />
                 Set Alert
               </button>
             </div>
@@ -211,12 +265,12 @@ export default function Home() {
         {/* Hero: Radial Gauge + Recommendation Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Radial Gauge */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col items-center justify-center">
+          <div className="lg:col-span-5 bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col items-center justify-center hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
             <div className="w-full flex items-center justify-between mb-2">
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              <h3 className="text-xs font-bold text-muted uppercase tracking-wider">
                 Tactical Pulse
               </h3>
-              <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+              <span className="text-[10px] font-bold text-muted opacity-60">
                 {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
@@ -239,12 +293,12 @@ export default function Home() {
           {/* Recommendation + Stats */}
           <div className="lg:col-span-7 space-y-4">
             {/* SIP / Lumpsum Recommendation Card */}
-            <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+            <div className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <h3 className="text-xs font-bold text-muted uppercase tracking-wider">
                   Investment Recommendation
                 </h3>
-                <span className="text-xs text-gray-400">
+                <span className="text-[10px] font-bold text-muted opacity-60">
                   Last updated: {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
                     day: "numeric",
                     month: "short",
@@ -255,34 +309,34 @@ export default function Home() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Mode</p>
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">{signal.recommendedMode}</p>
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Mode</p>
+                  <p className="text-sm font-bold text-foreground">{signal.recommendedMode}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Allocation</p>
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">{signal.allocationPercentage}%</p>
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Allocation</p>
+                  <p className="text-sm font-bold text-foreground">{signal.allocationPercentage}%</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Yield Gap</p>
-                  <p className={`text-sm font-bold ${signal.yieldGap > 0 ? "text-green-600" : "text-red-500"}`}>
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Yield Gap</p>
+                  <p className={`text-sm font-bold ${signal.yieldGap > 0 ? "text-emerald-500" : "text-rose-500"}`}>
                     {signal.yieldGap > 0 ? "+" : ""}{signal.yieldGap}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Confidence</p>
-                  <p className={`text-sm font-bold ${signal.confidence === "High" ? "text-green-600" :
-                    signal.confidence === "Medium" ? "text-yellow-600" : "text-red-500"
+                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Confidence</p>
+                  <p className={`text-sm font-bold ${signal.confidence === "High" ? "text-emerald-500" :
+                    signal.confidence === "Medium" ? "text-amber-500" : "text-rose-500"
                     }`}>
                     {signal.confidence}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  200-DMA Distance: <span className="font-bold text-gray-700 dark:text-gray-300">{signal.dmaDistance}%</span>
+              <div className="mt-4 pt-3 border-t border-border">
+                <p className="text-xs text-muted">
+                  200-DMA Distance: <span className="font-bold text-foreground">{signal.dmaDistance}%</span>
                   {signal.dmaDistance < -10 && (
-                    <span className="ml-2 text-green-600 font-semibold">Tactical Dip Zone</span>
+                    <span className="ml-2 text-emerald-500 font-bold">Tactical Dip Zone</span>
                   )}
                 </p>
               </div>
@@ -309,18 +363,18 @@ export default function Home() {
         </div>
 
         {/* Charts Section Header */}
-        <div className="pt-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
-          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+        <div className="pt-4 flex items-center justify-between border-b border-border pb-2 mb-2">
+          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
             Historical Trends
           </h2>
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shadow-inner">
+          <div className="flex bg-background border border-border rounded-xl p-1 shadow-inner">
             {(["1Y", "3Y", "5Y", "MAX"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${timeRange === range
-                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  ? "bg-card text-blue-500 shadow-sm border border-border"
+                  : "text-muted hover:text-foreground"
                   }`}
               >
                 {range}
@@ -368,8 +422,8 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-100 dark:border-gray-800">
-          <p>
+        <footer className="text-center text-[10px] text-muted py-8 border-t border-border opacity-50">
+          <p className="font-medium">
             Nifty Pulse v2.0 — Tactical Investment Command Center. For informational purposes only. Not financial advice.
           </p>
         </footer>

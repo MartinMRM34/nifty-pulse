@@ -32,76 +32,83 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm">
-      <div className="bg-white dark:bg-[#111111] rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-transparent dark:border-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-card rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-border">
         {submitted ? (
-          <div className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="p-10 text-center space-y-6">
+            <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Alert Created!</h2>
-            <p className="text-gray-500 dark:text-gray-400">
-              We&apos;ll notify <strong>{email}</strong> when {indexMeta?.name} enters the selected zone.
-            </p>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-black text-foreground tracking-tight">Alert Activated</h2>
+              <p className="text-muted font-medium">
+                We&apos;ll notify <span className="text-foreground font-bold">{email}</span> when <span className="text-foreground font-bold">{indexMeta?.name}</span> enters the selected zone.
+              </p>
+            </div>
             <button
               onClick={handleClose}
-              className="mt-6 w-full py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-xl font-semibold transition-colors"
+              className="mt-8 w-full py-4 bg-foreground text-background hover:opacity-90 rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl"
             >
               Done
             </button>
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+            <div className="flex items-center justify-between p-6 border-b border-border bg-card/50 backdrop-blur-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-blue-500/10 text-blue-500 rounded-xl border border-blue-500/20">
                   <BellRing className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">Create Alert</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{indexMeta?.name}</p>
+                  <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Create Alert</h2>
+                  <p className="text-[10px] text-muted font-black uppercase tracking-widest opacity-60">{indexMeta?.name}</p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                className="p-2 text-muted hover:text-foreground hover:bg-background rounded-full transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-5 space-y-5">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address</label>
+            <form onSubmit={handleSubmit} className="p-8 space-y-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Email Address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 outline-none transition-all placeholder:text-gray-400"
+                  className="w-full px-5 py-4 rounded-2xl border border-border bg-background text-foreground focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-muted/40 font-bold"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Notify me when index is</label>
-                <div className="grid grid-cols-1 gap-2">
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Target Zone</label>
+                <div className="grid grid-cols-1 gap-2.5">
                   {ZONES.slice(0, 3).map((z) => (
                     <button
                       key={z.zone}
                       type="button"
                       onClick={() => setTargetZone(z.zone)}
-                      className={`px-4 py-3 rounded-xl border text-left flex items-center justify-between transition-all ${
+                      className={`px-5 py-4 rounded-2xl border transition-all flex items-center justify-between group ${
                         targetZone === z.zone
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
+                          ? "border-blue-500 bg-blue-500/5 shadow-lg shadow-blue-500/10"
+                          : "border-border bg-background hover:border-blue-400"
                       }`}
                     >
-                      <span className={`font-semibold ${z.textColor}`}>{z.label}</span>
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                        targetZone === z.zone ? "border-blue-500" : "border-gray-300 dark:border-gray-600"
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${z.bgColor}`} />
+                        <span className={`font-black uppercase tracking-widest text-[10px] ${targetZone === z.zone ? "text-blue-500" : "text-foreground"}`}>
+                          {z.label}
+                        </span>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                        targetZone === z.zone ? "border-blue-500 bg-blue-500" : "border-border"
                       }`}>
-                        {targetZone === z.zone && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                        {targetZone === z.zone && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                       </div>
                     </button>
                   ))}
@@ -110,7 +117,7 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold shadow-sm hover:shadow-md transition-all"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-blue-500/25 transition-all active:scale-95"
               >
                 Set Alert
               </button>

@@ -72,23 +72,25 @@ export default function DateLookup({ valuation }: DateLookupProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+    <div className="bg-card rounded-2xl border border-border/50 p-5 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 w-full text-left"
+        className="flex items-center gap-2 w-full text-left group"
       >
-        <Calendar className="w-4 h-4 text-blue-600" />
-        <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex-1">
-          Date-Wise Lookup
+        <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 transition-colors">
+          <Calendar className="w-4 h-4" />
+        </div>
+        <h3 className="text-[10px] font-black text-muted uppercase tracking-widest flex-1">
+          Historical Lookup
         </h3>
-        <span className="text-xs text-blue-600 font-medium">
+        <span className="text-[10px] text-blue-500 font-black uppercase tracking-widest px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
           {isOpen ? "Close" : "Time Travel"}
         </span>
       </button>
 
       {isOpen && (
-        <div className="mt-4 space-y-4">
-          <div className="flex items-center gap-2">
+        <div className="mt-6 space-y-6">
+          <div className="flex items-center gap-3">
             <input
               type="date"
               value={selectedDate}
@@ -99,56 +101,55 @@ export default function DateLookup({ valuation }: DateLookupProps) {
               }}
               min={minDate}
               max={maxDate}
-              className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-bold"
             />
             <button
               onClick={() => handleLookup()}
               disabled={!selectedDate}
-              className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-blue-500/20"
             >
-              Look Up
-              <ArrowRight className="w-3 h-3" />
+              Go
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {historicalSignal && (
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-xs text-gray-400 mb-3 text-center">
-                Signal on {new Date(selectedDate).toLocaleDateString("en-IN", {
+            <div className="pt-6 border-t border-border">
+              <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-6 text-center opacity-60">
+                Market Pulse on {new Date(selectedDate).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
                 })}
               </p>
               
-              <div className="flex items-center justify-between gap-1 overflow-hidden">
+              <div className="flex items-center justify-between gap-1 overflow-visible">
                 <button
                   onClick={() => navigate("prev")}
                   disabled={!canGoPrev}
-                  className="p-1.5 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1 shrink-0"
-                  title="See previous market day"
+                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all group flex flex-col items-center gap-1 shrink-0"
+                  title="Previous Day"
                 >
-                  <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600 px-1">Prev Day</span>
+                  <ChevronLeft className="w-5 h-5 text-foreground" />
                 </button>
 
                 {/* Left side stats: High / Low */}
-                <div className="flex flex-col gap-3 text-right min-w-[60px] shrink-0">
+                <div className="flex flex-col gap-4 text-right min-w-[70px] shrink-0">
                   <div className="space-y-0.5">
-                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day High</p>
-                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <p className="text-[9px] font-black text-muted uppercase tracking-tighter opacity-70">High</p>
+                    <p className="text-sm font-black text-emerald-500">
                       {selectedSnapshot?.high?.toLocaleString("en-IN")}
                     </p>
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day Low</p>
-                    <p className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                    <p className="text-[9px] font-black text-muted uppercase tracking-tighter opacity-70">Low</p>
+                    <p className="text-sm font-black text-rose-500">
                       {selectedSnapshot?.low?.toLocaleString("en-IN")}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex-1 min-w-0 flex justify-center">
+                <div className="flex-1 min-w-0 flex justify-center scale-110">
                   <RadialGauge 
                     signal={historicalSignal} 
                     size={180} 
@@ -156,16 +157,16 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                 </div>
 
                 {/* Right side stats: Close / Open */}
-                <div className="flex flex-col gap-3 text-left min-w-[70px] shrink-0">
+                <div className="flex flex-col gap-4 text-left min-w-[80px] shrink-0">
                   <div className="space-y-0.5">
-                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Index Close</p>
-                    <p className="text-xs font-bold text-gray-900 dark:text-white">
+                    <p className="text-[9px] font-black text-muted uppercase tracking-tighter opacity-70">Close</p>
+                    <p className="text-sm font-black text-foreground">
                       {selectedSnapshot?.close?.toLocaleString("en-IN")}
                     </p>
                   </div>
                   <div className="space-y-0.5">
-                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day Open</p>
-                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                    <p className="text-[9px] font-black text-muted uppercase tracking-tighter opacity-70">Open</p>
+                    <p className="text-sm font-black text-muted">
                       {selectedSnapshot?.open?.toLocaleString("en-IN") || "-"}
                     </p>
                   </div>
@@ -174,11 +175,10 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                 <button
                   onClick={() => navigate("next")}
                   disabled={!canGoNext}
-                  className="p-1.5 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1 shrink-0"
-                  title="See next market day"
+                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all group flex flex-col items-center gap-1 shrink-0"
+                  title="Next Day"
                 >
-                  <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600 px-1">Next Day</span>
+                  <ChevronRight className="w-5 h-5 text-foreground" />
                 </button>
               </div>
             </div>
