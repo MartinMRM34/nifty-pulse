@@ -78,39 +78,42 @@ export default function DateLookup({ valuation }: DateLookupProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 w-full text-left group"
       >
-        <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 transition-colors">
+        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 transition-colors">
           <Calendar className={DS.ICON.SM} />
         </div>
-        <h3 className={`${DS.TEXT.MUTED_CAPS} flex-1`}>
+        <h3 className={`${DS.TEXT.H2} flex-1 text-left`}>
           Historical Lookup
         </h3>
-        <span className={`${DS.TEXT.MUTED_CAPS} text-blue-500 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20`}>
+        <span className={`${DS.TEXT.TINY_CAPS} px-2.5 py-1 rounded-lg bg-blue-500/5 text-blue-600 dark:text-blue-400 border border-blue-500/10`}>
           {isOpen ? "Close" : "Time Travel"}
         </span>
       </button>
 
       {isOpen && (
         <div className="mt-6 space-y-6">
-          <div className="flex items-center gap-3">
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-                setHistoricalSignal(null);
-                setSelectedSnapshot(null);
-              }}
-              min={minDate}
-              max={maxDate}
-              className="flex-1 px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-bold"
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 group">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => {
+                  setSelectedDate(e.target.value);
+                  setHistoricalSignal(null);
+                  setSelectedSnapshot(null);
+                }}
+                min={minDate}
+                max={maxDate}
+                className="w-full pl-4 pr-10 py-2.5 text-sm border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all font-bold group-hover:border-blue-500/30"
+              />
+              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted/40 pointer-events-none transition-colors group-focus-within:text-blue-500" />
+            </div>
             <button
               onClick={() => handleLookup()}
               disabled={!selectedDate}
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-blue-500/20"
+              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-xl shadow-blue-500/25 active:scale-95 flex items-center gap-2"
             >
               Go
-              <ArrowRight className={DS.ICON.SM} />
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 

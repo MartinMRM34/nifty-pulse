@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Activity, BellRing, List, Sun, Moon, SunMoon, HelpCircle } from "lucide-react";
+import { Activity, BellRing, List, Sun, Moon, SunMoon, HelpCircle, X } from "lucide-react";
 import { IndexId, IndexValuation, TacticalSignal } from "@/types";
 import { getIndexValuation } from "@/data";
 import { getGSecYield, GSecData } from "@/data/market";
@@ -302,7 +302,7 @@ export default function Home() {
           {/* Recommendation + Stats */}
           <div className="lg:col-span-7 space-y-4">
             {/* SIP / Lumpsum Recommendation Card */}
-            <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${DS.CARD.INTERACTIVE} ${isYieldInfoOpen ? 'relative z-50' : 'relative z-0'}`}>
+            <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${!isYieldInfoOpen ? DS.CARD.INTERACTIVE : ""} ${isYieldInfoOpen ? 'relative z-50' : 'relative z-0'}`}>
               <div className="flex items-center justify-between mb-4">
                 <h3 className={DS.TEXT.LABEL}>
                   Investment Recommendation
@@ -338,20 +338,23 @@ export default function Home() {
                   
                   {/* Enhanced Interpretation Tooltip - Click to Toggle */}
                   {isYieldInfoOpen && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 sm:w-85 p-5 bg-slate-950 border border-white/20 rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.8)] z-[60] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
+                    <div className={`fixed sm:absolute inset-x-4 sm:inset-auto top-1/2 sm:top-full left-1/2 sm:left-1/2 -translate-x-1/2 -translate-y-1/2 sm:translate-y-0 sm:mt-3 w-auto sm:w-85 p-5 ${DS.MODAL.POPOVER}`}>
                       <div className="space-y-5">
-                        <div className="flex items-start justify-between border-b border-white/10 pb-3">
+                        <div className="flex items-start justify-between border-b border-slate-100 dark:border-white/10 pb-3">
                           <div>
-                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1.5 opacity-80">Tactical Formula</p>
-                            <p className="text-xs font-black text-white tracking-tight">
-                              (1 / P.E × 100) — <span className="text-emerald-400">{signal.gsecYield}%</span> G-Sec
+                            <p className="text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1.5 opacity-80">Tactical Formula</p>
+                            <p className="text-xs font-black text-slate-900 dark:text-white tracking-tight">
+                              (1 / P.E × 100) — <span className="text-emerald-500 dark:text-emerald-400">{signal.gsecYield}%</span> G-Sec
                             </p>
                           </div>
                           <button 
-                            onClick={() => setIsYieldInfoOpen(false)}
-                            className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsYieldInfoOpen(false);
+                            }}
+                            className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors"
                           >
-                            <Activity className="w-3 h-3 text-slate-500" />
+                            <X className="w-4 h-4 text-slate-500" />
                           </button>
                         </div>
                         
@@ -363,27 +366,27 @@ export default function Home() {
                               <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981]" />
                               <p className="text-[11px] font-black text-emerald-400 uppercase">Strong Buy (+1.5% and up)</p>
                             </div>
-                            <p className="text-[10px] text-slate-100 leading-normal font-medium">Equities are highly attractive. Earnings yield is higher than bond rates. Massive Lumpsum trigger.</p>
+                            <p className="text-[10px] text-slate-700 dark:text-slate-100 leading-normal font-medium">Equities are highly attractive. Earnings yield is higher than bond rates. Massive Lumpsum trigger.</p>
                           </div>
                           
                           <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20">
                             <div className="flex items-center gap-2 mb-1.5">
                               <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6]" />
-                              <p className="text-[11px] font-black text-blue-400 uppercase">Fair Value (-1.0% to -2.5%)</p>
+                              <p className="text-[11px] font-black text-blue-500 dark:text-blue-400 uppercase">Fair Value (-1.0% to -2.5%)</p>
                             </div>
-                            <p className="text-[10px] text-slate-100 leading-normal font-medium">Historical average. Equities are fairly valued relative to debt. Standard Continue SIP zone.</p>
+                            <p className="text-[10px] text-slate-700 dark:text-slate-100 leading-normal font-medium">Historical average. Equities are fairly valued relative to debt. Standard Continue SIP zone.</p>
                           </div>
                           
                           <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20">
                             <div className="flex items-center gap-2 mb-1.5">
                               <div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_12px_#ef4444]" />
-                              <p className="text-[11px] font-black text-rose-400 uppercase">Overheated (-4.0% or worse)</p>
+                              <p className="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase">Overheated (-4.0% or worse)</p>
                             </div>
-                            <p className="text-[10px] text-slate-100 leading-normal font-medium">Index is overheated; high risk for low yield. Bonds are safer. Triggers Caution signal.</p>
+                            <p className="text-[10px] text-slate-700 dark:text-slate-100 leading-normal font-medium">Index is overheated; high risk for low yield. Bonds are safer. Triggers Caution signal.</p>
                           </div>
                         </div>
                       </div>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-[10px] border-transparent border-b-slate-950" />
+                      <div className="hidden sm:block absolute bottom-full left-1/2 -translate-x-1/2 border-[10px] border-transparent border-b-white dark:border-b-slate-950" />
                     </div>
                   )}
 
@@ -418,10 +421,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Date Lookup */}
             <DateLookup valuation={valuation} />
           </div>
         </div>
+
 
         {/* Thirukkural — Market Wisdom */}
         <ThirukkuralCard signal={signal.signal} />
@@ -459,8 +462,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Major Charts */}
-        <div className="space-y-4">
+        {/* Major Charts — Side by Side Comparison */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
           <ValuationChart
             data={valuation.history}
             metric="pe"

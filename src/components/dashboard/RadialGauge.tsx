@@ -180,7 +180,7 @@ export default function RadialGauge({ signal, size = 280, value, statsData }: Ra
       {/* Signal label and action */}
       <div className="text-center -mt-2">
         <span
-          className="inline-block px-5 py-2 rounded-full text-[11px] font-black text-white uppercase tracking-wider shadow-lg shadow-current/20 border border-white/10"
+          className="inline-block px-5 py-2 rounded-full text-[11px] font-black text-white uppercase tracking-wider shadow-md shadow-black/10 border border-white/10"
           style={{ backgroundColor: signalColor }}
         >
           {signal.label}
@@ -189,7 +189,13 @@ export default function RadialGauge({ signal, size = 280, value, statsData }: Ra
           {signal.recommendedAction}
         </p>
         <p className="text-[10px] text-muted mt-1 font-medium opacity-60">
-          {percentile}th percentile
+          {percentile}{
+            (() => {
+              const s = ["th", "st", "nd", "rd"],
+                v = percentile % 100;
+              return s[(v - 20) % 10] || s[v] || s[0];
+            })()
+          } percentile
         </p>
       </div>
     </div>

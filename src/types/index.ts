@@ -40,6 +40,7 @@ export interface IndexValuation {
   pe: ValuationStats;
   pb: ValuationStats;
   dividendYield: ValuationStats;
+  close: ValuationStats;
   history: ValuationSnapshot[];
 }
 

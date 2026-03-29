@@ -44,6 +44,7 @@ export const DS = {
     CONTENT: "bg-card rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-border flex flex-col",
     HEADER: "flex items-center justify-between p-6 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10",
     FOOTER: "p-5 bg-background text-[9px] font-black text-muted/40 uppercase tracking-widest text-center border-t border-border flex items-center justify-center gap-2",
+    POPOVER: "bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl sm:rounded-3xl shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] z-[100] animate-in fade-in zoom-in slide-in-from-top-2 duration-300",
   },
 
   // Components (Chips, Inputs, Buttons)

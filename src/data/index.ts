@@ -66,6 +66,7 @@ async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | n
 
   const pbValues = history.map((h) => h.pb);
   const dyValues = history.map((h) => h.dividendYield);
+  const closeValues = history.map((h) => h.close || 0).filter(v => v > 0);
 
   return {
     indexId,
@@ -73,6 +74,7 @@ async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | n
     pe: computeStats(peValues, latest.pe),
     pb: computeStats(pbValues, latest.pb),
     dividendYield: computeStats(dyValues, latest.dividendYield),
+    close: computeStats(closeValues, latest.close || 0),
     history,
   };
 }
