@@ -2,6 +2,7 @@
 
 import { IndexValuation, Zone } from "@/types";
 import { getZone, ZONES } from "@/lib/constants";
+import { DS } from "@/lib/design-system";
 
 interface OverallSignalProps {
   valuation: IndexValuation;
@@ -32,12 +33,12 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE}`}>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className={DS.TEXT.MUTED_CAPS}>
           Overall Market Signal
         </h3>
-        <span className="text-xs text-gray-400">
+        <span className={DS.TEXT.TINY}>
           Last updated: {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "short",
@@ -46,36 +47,36 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
         </span>
       </div>
 
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-6 mb-8">
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-          style={{ backgroundColor: zone.color }}
+          className="w-20 h-20 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-xl border-4 border-white/10"
+          style={{ backgroundColor: zone.color, boxShadow: `0 0 20px ${zone.color}40` }}
         >
           {overallPercentile}
         </div>
-        <div>
-          <p className={`text-lg font-semibold ${zone.textColor}`}>{zone.label}</p>
-          <p className="text-sm text-gray-500 mt-1">{signalMessage[zone.zone]}</p>
+        <div className="flex-1">
+          <p className={`text-xl font-black uppercase tracking-tight ${zone.textColor}`}>{zone.label}</p>
+          <p className={`${DS.TEXT.BODY} mt-1 opacity-80`}>{signalMessage[zone.zone]}</p>
         </div>
       </div>
 
       {latestSnapshot?.close && (
-        <div className="mb-6 grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Index Price</p>
-            <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+        <div className="mb-8 grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-blue-400">
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Index Price</p>
+            <p className={DS.TEXT.H2}>
               {latestSnapshot.close.toLocaleString("en-IN")}
             </p>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day High</p>
-            <p className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-emerald-400">
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Day High</p>
+            <p className="text-base font-black text-emerald-500">
               {latestSnapshot.high?.toLocaleString("en-IN")}
             </p>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day Low</p>
-            <p className="text-base font-bold text-rose-600 dark:text-rose-400">
+          <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-rose-400">
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Day Low</p>
+            <p className="text-base font-black text-rose-500">
               {latestSnapshot.low?.toLocaleString("en-IN")}
             </p>
           </div>
@@ -83,8 +84,17 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
       )}
 
       {/* Zone bar */}
-      <div className="mt-4">
-        <div className="relative h-3">
+      <div className="mt-4 px-1">
+        <div className="relative h-2">
+          <div className="flex absolute inset-0 rounded-full overflow-hidden opacity-30 blur-[1px]">
+            {ZONES.map((z) => (
+              <div
+                key={z.zone}
+                className="flex-1"
+                style={{ backgroundColor: z.color }}
+              />
+            ))}
+          </div>
           <div className="flex absolute inset-0 rounded-full overflow-hidden">
             {ZONES.map((z) => (
               <div
@@ -96,21 +106,18 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           </div>
           {/* Indicator Dot */}
           <div
-            className="absolute top-1/2 w-6 h-6 bg-white border-[3px] border-gray-800 rounded-full shadow-md transition-all duration-300 z-10"
+            className={`absolute top-1/2 ${DS.DOT.XL} bg-white dark:bg-slate-200 border-[4px] border-slate-900 rounded-full shadow-xl ${DS.ANIM.TRANSITION} duration-700 ease-out z-10`}
             style={{
               left: `${Math.max(0, Math.min(100, overallPercentile))}%`,
               transform: "translate(-50%, -50%)",
             }}
           />
         </div>
-        <div className="flex justify-between mt-3">
-          <span className="text-[10px] text-gray-400">Undervalued</span>
-          <span className="text-[10px] text-gray-400">Overvalued</span>
+        <div className="flex justify-between mt-6">
+          <span className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-40`}>Undervalued</span>
+          <span className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-40`}>Overvalued</span>
         </div>
       </div>
-      <p className="mt-4 text-[10px] text-gray-400 italic">
-        * Valuation percentiles for P/E are calculated based on post-April 2021 consolidated reporting standards.
-      </p>
     </div>
   );
 }

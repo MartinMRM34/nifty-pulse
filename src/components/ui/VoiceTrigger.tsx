@@ -8,6 +8,7 @@ import {
   parseVoiceCommand,
 } from "@/lib/voice";
 import { IndexId } from "@/types";
+import { DS } from "@/lib/design-system";
 
 interface VoiceTriggerProps {
   onIndexChange: (id: IndexId) => void;
@@ -68,16 +69,22 @@ export default function VoiceTrigger({
   return (
     <button
       onClick={toggleListening}
-      className={`relative p-2.5 rounded-full transition-all ${
+      className={`relative p-2.5 rounded-full border ${DS.ANIM.TRANSITION} shadow-sm group ${
         isListening
-          ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-          : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+          ? "bg-rose-500 text-white border-rose-400 scale-110 shadow-lg shadow-rose-500/20"
+          : "bg-background text-muted border-border hover:border-blue-400 hover:text-foreground"
       }`}
       title={isListening ? "Stop listening" : "Voice command"}
     >
-      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+      {isListening ? (
+        <div className="relative z-10">
+          <MicOff className={DS.ICON.SM} />
+        </div>
+      ) : (
+        <Mic className={DS.ICON.SM} />
+      )}
       {isListening && (
-        <span className="absolute inset-0 rounded-full animate-ping bg-red-400 opacity-30" />
+        <div className="absolute inset-0 rounded-full animate-ping bg-rose-500 opacity-40 scale-125" />
       )}
     </button>
   );

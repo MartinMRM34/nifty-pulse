@@ -9,10 +9,10 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
-  Legend,
 } from "recharts";
 import { ValuationSnapshot } from "@/types";
 import { useMemo } from "react";
+import { DS } from "@/lib/design-system";
 
 interface ValuationChartProps {
   data: ValuationSnapshot[];
@@ -100,106 +100,92 @@ export default function ValuationChart({
   }));
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-          {title}
-        </h3>
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE} flex flex-col h-full`}>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className={DS.TEXT.MUTED_CAPS}>
+            {title}
+          </h3>
+          <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-30 mt-0.5 whitespace-nowrap`}>Rolling {timeRange} Analysis</p>
+        </div>
         {week52 && (
-          <div className="flex gap-3 text-[10px] text-gray-400">
-            <span>52W H: <span className="font-bold text-red-500">{week52.high.toFixed(2)}</span></span>
-            <span>52W L: <span className="font-bold text-green-500">{week52.low.toFixed(2)}</span></span>
+          <div className={`flex gap-4 ${DS.TEXT.TINY_CAPS} font-black`}>
+            <span className="flex flex-col items-end">
+              <span className="opacity-40 mb-0.5">52W High</span>
+              <span className="text-rose-500">{week52.high.toFixed(2)}</span>
+            </span>
+            <span className="flex flex-col items-end">
+              <span className="opacity-40 mb-0.5">52W Low</span>
+              <span className="text-emerald-500">{week52.low.toFixed(2)}</span>
+            </span>
           </div>
         )}
       </div>
       <div className={height}>
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: -25 }}>
             <defs>
               <linearGradient id={`gradient-${metric}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.2} />
-                <stop offset="95%" stopColor={color} stopOpacity={0.02} />
+                <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={color} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="4 4" stroke="currentColor" className="text-border/40" vertical={false} />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 11, fill: "#9ca3af" }}
+              tick={{ fontSize: 9, fontWeight: 700, fill: "currentColor" }}
+              className="text-muted/50"
+              axisLine={false}
+              tickLine={false}
               interval={Math.floor(chartData.length / 6)}
               tickFormatter={(val) =>
-                new Date(val).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+                new Date(val).toLocaleDateString("en-IN", { month: "short", year: "2-digit" })
               }
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "#9ca3af" }}
+              tick={{ fontSize: 9, fontWeight: 700, fill: "currentColor" }}
+              className="text-muted/50"
+              axisLine={false}
+              tickLine={false}
               domain={["auto", "auto"]}
             />
             <Tooltip
               contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid #e5e7eb",
-                fontSize: "13px",
+                backgroundColor: "var(--bg-card)",
+                borderRadius: "16px",
+                border: "1px solid var(--border)",
+                padding: "12px",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                fontSize: "12px",
+                fontWeight: "bold",
               }}
+              itemStyle={{ color: color }}
+              cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: "4 4" }}
               formatter={(value) => [Number(value).toFixed(2), metricLabels[metric]]}
               labelFormatter={(_, payload) => {
                 if (payload && payload.length > 0) {
-                  return payload[0].payload.fullDate;
+                  return <span className={`${DS.TEXT.MUTED_CAPS} opacity-100`}>{payload[0].payload.fullDate}</span>;
                 }
                 return "";
               }}
             />
-            <Legend />
             <Area
               type="monotone"
               dataKey="value"
               stroke={color}
-              strokeWidth={2}
+              strokeWidth={3}
               fill={`url(#gradient-${metric})`}
               name={metricLabels[metric]}
+              animationDuration={1500}
             />
             {/* Median reference line */}
             <ReferenceLine
               y={median}
-              stroke="#6b7280"
+              stroke="currentColor"
+              className="text-muted/60"
               strokeDasharray="6 4"
-              strokeWidth={1.5}
-              label={{
-                value: `Median: ${median.toFixed(2)}`,
-                position: "insideBottomRight",
-                fill: "#6b7280",
-                fontSize: 11,
-              }}
+              strokeWidth={1}
             />
-            {/* 52-Week High */}
-            {week52 && (
-              <ReferenceLine
-                y={week52.high}
-                stroke="#ef4444"
-                strokeDasharray="4 4"
-                strokeWidth={1}
-                label={{
-                  value: `52W High: ${week52.high.toFixed(2)}`,
-                  position: "insideBottomRight",
-                  fill: "#ef4444",
-                  fontSize: 10,
-                }}
-              />
-            )}
-            {/* 52-Week Low */}
-            {week52 && (
-              <ReferenceLine
-                y={week52.low}
-                stroke="#16a34a"
-                strokeDasharray="4 4"
-                strokeWidth={1}
-                label={{
-                  value: `52W Low: ${week52.low.toFixed(2)}`,
-                  position: "insideBottomRight",
-                  fill: "#16a34a",
-                  fontSize: 10,
-                }}
-              />
-            )}
           </ComposedChart>
         </ResponsiveContainer>
       </div>
