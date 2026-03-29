@@ -82,9 +82,30 @@ export default function Home() {
 
   // Voice callbacks
   const handleReadThirukkural = useCallback(() => {
-    const verse = getTodayVerse();
-    speak(verse.english);
-  }, []);
+    // Map signal to voice context
+    const getVoiceContext = () => {
+      if (!signal) return "Market wisdom for today. ";
+      if (signal.signal === "strong-buy" || signal.signal === "tactical-dip" || signal.signal === "buy") {
+        return "Given today's opportunistic signal, Valluvar advises. ";
+      }
+      if (signal.signal === "overvalued") {
+        return "Given today's overvalued signal, Valluvar advises caution. He says. ";
+      }
+      if (signal.signal === "hold") {
+        return "Regarding today's neutral signal, Valluvar advises. ";
+      }
+      return "Market wisdom for today. ";
+    };
+
+    const category = signal ? (
+      (signal.signal === "strong-buy" || signal.signal === "tactical-dip" || signal.signal === "buy") ? "BULLISH" :
+        (signal.signal === "overvalued") ? "BEARISH" :
+          (signal.signal === "hold") ? "NEUTRAL" : "GENERAL"
+    ) : undefined;
+
+    const verse = getTodayVerse(category as any);
+    speak(`${getVoiceContext()} ${verse.english}`);
+  }, [signal]);
 
   const handleReadSignal = useCallback(() => {
     if (signal && indexMeta) {
@@ -227,10 +248,9 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Confidence</p>
-                  <p className={`text-sm font-bold ${
-                    signal.confidence === "High" ? "text-green-600" :
+                  <p className={`text-sm font-bold ${signal.confidence === "High" ? "text-green-600" :
                     signal.confidence === "Medium" ? "text-yellow-600" : "text-red-500"
-                  }`}>
+                    }`}>
                     {signal.confidence}
                   </p>
                 </div>
@@ -251,6 +271,9 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Thirukkural — Market Wisdom */}
+        <ThirukkuralCard signal={signal.signal} />
+
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MetricCard title="P/E Ratio" stats={valuation.pe} unit="x" />
@@ -262,9 +285,6 @@ export default function Home() {
             invertedSignal
           />
         </div>
-
-        {/* Thirukkural — Market Wisdom */}
-        <ThirukkuralCard />
 
         {/* Charts Section Header */}
         <div className="pt-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">

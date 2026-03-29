@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, ArrowRight } from "lucide-react";
-import { IndexValuation, TacticalSignal } from "@/types";
+import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { IndexValuation, TacticalSignal, ValuationSnapshot } from "@/types";
 import { getInvestmentStrategy } from "@/lib/signals";
 import RadialGauge from "./RadialGauge";
 
@@ -17,6 +17,7 @@ interface DateLookupProps {
 export default function DateLookup({ valuation }: DateLookupProps) {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [historicalSignal, setHistoricalSignal] = useState<TacticalSignal | null>(null);
+  const [selectedSnapshot, setSelectedSnapshot] = useState<ValuationSnapshot | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   // Available date range
@@ -24,14 +25,17 @@ export default function DateLookup({ valuation }: DateLookupProps) {
   const minDate = dates.length > 0 ? dates[0] : "";
   const maxDate = dates.length > 0 ? dates[dates.length - 1] : "";
 
-  function handleLookup() {
-    if (!selectedDate) return;
+  function handleLookup(dateOverride?: string) {
+    const dateToUse = dateOverride || selectedDate;
+    if (!dateToUse) return;
 
     // Find the snapshot for the selected date (or nearest previous)
-    const targetIdx = valuation.history.findIndex((h) => h.date >= selectedDate);
+    const targetIdx = valuation.history.findIndex((h) => h.date >= dateToUse);
     if (targetIdx < 0) return;
 
     const snapshot = valuation.history[targetIdx];
+    setSelectedSnapshot(snapshot);
+
     // Build a "virtual" valuation up to that date to compute the signal
     const historyUpToDate = valuation.history.slice(0, targetIdx + 1);
 
@@ -55,6 +59,17 @@ export default function DateLookup({ valuation }: DateLookupProps) {
     const signal = getInvestmentStrategy(virtualValuation);
     setHistoricalSignal(signal);
   }
+
+  const currentIndex = valuation.history.findIndex((h) => h.date >= selectedDate);
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex >= 0 && currentIndex < valuation.history.length - 1;
+
+  const navigate = (direction: "prev" | "next") => {
+    const nextIdx = direction === "prev" ? currentIndex - 1 : currentIndex + 1;
+    const newDate = valuation.history[nextIdx].date;
+    setSelectedDate(newDate);
+    handleLookup(newDate);
+  };
 
   return (
     <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
@@ -80,13 +95,14 @@ export default function DateLookup({ valuation }: DateLookupProps) {
               onChange={(e) => {
                 setSelectedDate(e.target.value);
                 setHistoricalSignal(null);
+                setSelectedSnapshot(null);
               }}
               min={minDate}
               max={maxDate}
               className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
-              onClick={handleLookup}
+              onClick={() => handleLookup()}
               disabled={!selectedDate}
               className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -104,7 +120,55 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                   year: "numeric",
                 })}
               </p>
-              <RadialGauge signal={historicalSignal} size={200} />
+              
+              <div className="flex items-center justify-between gap-2 overflow-hidden">
+                <button
+                  onClick={() => navigate("prev")}
+                  disabled={!canGoPrev}
+                  className="p-2 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1"
+                  title="See previous market day"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600">Prev Day</span>
+                </button>
+
+                <div className="flex-1 min-w-0">
+                  <RadialGauge signal={historicalSignal} size={200} />
+                </div>
+
+                <button
+                  onClick={() => navigate("next")}
+                  disabled={!canGoNext}
+                  className="p-2 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1"
+                  title="See next market day"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600">Next Day</span>
+                </button>
+              </div>
+
+              {selectedSnapshot?.close && (
+                <div className="mt-4 grid grid-cols-3 gap-2 px-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Index Close</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                      {selectedSnapshot.close.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day High</p>
+                    <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                      {selectedSnapshot.high?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day Low</p>
+                    <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                      {selectedSnapshot.low?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

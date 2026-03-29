@@ -19,6 +19,10 @@ export interface ValuationSnapshot {
   pe: number;
   pb: number;
   dividendYield: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
 }
 
 export interface ValuationStats {
@@ -94,4 +98,5 @@ export interface ThirukkuralVerse {
   transliteration: string;
   english: string;
   topic: string;
+  category?: "BULLISH" | "BEARISH" | "NEUTRAL" | "GENERAL";
 }
