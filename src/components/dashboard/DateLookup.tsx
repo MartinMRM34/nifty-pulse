@@ -5,7 +5,7 @@ import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { IndexValuation, TacticalSignal, ValuationSnapshot } from "@/types";
 import { getInvestmentStrategy } from "@/lib/signals";
 import { DS } from "@/lib/design-system";
-import RadialGauge from "./RadialGauge";
+import HorizontalPulseBar from "./HorizontalPulseBar";
 
 interface DateLookupProps {
   valuation: IndexValuation;
@@ -144,16 +144,15 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                   <ChevronLeft className={DS.ICON.MD} />
                 </button>
 
-                <div className="flex-1 flex justify-center min-w-0">
-                  <RadialGauge
+                <div className="flex-1 min-w-0">
+                  <HorizontalPulseBar
                     signal={historicalSignal}
-                    size={150}
-                    isHistorical={true}
+                    value={selectedSnapshot?.close?.toLocaleString("en-IN")}
                     statsData={{
                       high: selectedSnapshot?.high?.toLocaleString("en-IN"),
                       low: selectedSnapshot?.low?.toLocaleString("en-IN"),
+                      open: selectedSnapshot?.open?.toLocaleString("en-IN"),
                       close: selectedSnapshot?.close?.toLocaleString("en-IN"),
-                      open: selectedSnapshot?.open?.toLocaleString("en-IN") || undefined,
                     }}
                   />
                 </div>

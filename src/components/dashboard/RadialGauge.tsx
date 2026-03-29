@@ -44,7 +44,7 @@ const getRetrospectiveText = (signal: string) => {
   return { label: labels[signal] || "Unknown", action: actions[signal] || "No recommendation" };
 };
 
-export default function RadialGauge({ signal, size = 280, value, statsData, isHistorical }: RadialGaugeProps) {
+export default function RadialGauge({ signal, size = 280, value, statsData }: RadialGaugeProps) {
   const percentile = signal.pePercentile;
   const clampedPct = Math.max(0, Math.min(100, percentile));
   const needleAngle = -90 + (clampedPct / 100) * 180;
@@ -85,7 +85,6 @@ export default function RadialGauge({ signal, size = 280, value, statsData, isHi
   const needleY = cy + needleLength * Math.sin(needleRad - Math.PI / 2);
 
   const signalColor = SIGNAL_COLORS[signal.signal] || "#6b7280";
-  const retroText = getRetrospectiveText(signal.signal);
 
   // Stats text positioning — aligned to the arc endpoints
   const leftArcX = cx - radius;
@@ -199,15 +198,15 @@ export default function RadialGauge({ signal, size = 280, value, statsData, isHi
       </svg>
 
       {/* Signal label and action */}
-      <div className={`text-center ${isHistorical ? 'mt-1' : '-mt-2'}`}>
+      <div className="text-center -mt-2">
         <span
-          className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black text-white uppercase tracking-wider shadow-md shadow-black/10 border border-white/5"
+          className="inline-block px-5 py-2 rounded-full text-[11px] font-black text-white uppercase tracking-wider shadow-md shadow-black/10 border border-white/10"
           style={{ backgroundColor: signalColor }}
         >
-          {isHistorical ? retroText.label : signal.label}
+          {signal.label}
         </span>
-        <p className={`text-foreground font-bold px-4 max-w-[280px] ${isHistorical ? 'text-xs mt-3 opacity-90' : 'text-sm mt-3'}`}>
-          {isHistorical ? retroText.action : signal.recommendedAction}
+        <p className="text-sm text-foreground mt-3 font-bold px-4 max-w-[240px]">
+          {signal.recommendedAction}
         </p>
         <p className="text-[10px] text-muted mt-1 font-medium opacity-60">
           {percentile}{
@@ -220,5 +219,6 @@ export default function RadialGauge({ signal, size = 280, value, statsData, isHi
         </p>
       </div>
     </div>
+
   );
 }
