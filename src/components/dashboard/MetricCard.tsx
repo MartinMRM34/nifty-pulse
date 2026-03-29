@@ -20,9 +20,9 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
   const TrendIcon = Math.abs(diffFromMedian) < 0.1 ? Minus : isAboveMedian ? TrendingUp : TrendingDown;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{title}</h3>
         <span
           className={`px-2.5 py-1 rounded-full text-xs font-semibold ${zone.bgColor} ${zone.textColor}`}
         >
@@ -31,7 +31,7 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
       </div>
 
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-3xl font-bold text-gray-900">
+        <span className="text-3xl font-bold text-gray-900 dark:text-white">
           {stats.current.toFixed(2)}
         </span>
         <span className="text-sm text-gray-400">{unit}</span>
@@ -62,17 +62,17 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
       </div>
 
       <div className="space-y-2 text-sm">
-        <div className="flex justify-between text-gray-500">
+        <div className="flex justify-between text-gray-500 dark:text-gray-400">
           <span>Median</span>
-          <span className="font-medium text-gray-700">{stats.median.toFixed(2)}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{stats.median.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-gray-500">
+        <div className="flex justify-between text-gray-500 dark:text-gray-400">
           <span>Mean</span>
-          <span className="font-medium text-gray-700">{stats.mean.toFixed(2)}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{stats.mean.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-gray-500">
+        <div className="flex justify-between text-gray-500 dark:text-gray-400">
           <span>Range</span>
-          <span className="font-medium text-gray-700">
+          <span className="font-medium text-gray-700 dark:text-gray-300">
             {stats.min.toFixed(2)} - {stats.max.toFixed(2)}
           </span>
         </div>
@@ -82,7 +82,7 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
             <span>Percentile</span>
             <span>{stats.percentile}th</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2">
+          <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
             <div
               className="h-2 rounded-full transition-all duration-500"
               style={{

@@ -32,9 +32,9 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
           Overall Market Signal
         </h3>
         <span className="text-xs text-gray-400">
@@ -55,7 +55,7 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
         </div>
         <div>
           <p className={`text-lg font-semibold ${zone.textColor}`}>{zone.label}</p>
-          <p className="text-sm text-gray-500 mt-1">{signalMessage[zone.zone]}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{signalMessage[zone.zone]}</p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           </div>
           {/* Indicator Dot */}
           <div
-            className="absolute top-1/2 w-6 h-6 bg-white border-[3px] border-gray-800 rounded-full shadow-md transition-all duration-300 z-10"
+            className="absolute top-1/2 w-6 h-6 bg-white dark:bg-gray-200 border-[3px] border-gray-800 rounded-full shadow-md transition-all duration-300 z-10"
             style={{
               left: `${Math.max(0, Math.min(100, overallPercentile))}%`,
               transform: "translate(-50%, -50%)",
