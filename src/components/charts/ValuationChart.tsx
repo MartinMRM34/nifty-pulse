@@ -165,7 +165,7 @@ export default function ValuationChart({
               strokeWidth={1.5}
               label={{
                 value: `Median: ${median.toFixed(2)}`,
-                position: "top",
+                position: "insideBottomRight",
                 fill: "#6b7280",
                 fontSize: 11,
               }}
@@ -179,7 +179,7 @@ export default function ValuationChart({
                 strokeWidth={1}
                 label={{
                   value: `52W High: ${week52.high.toFixed(2)}`,
-                  position: "insideTopRight",
+                  position: "insideBottomRight",
                   fill: "#ef4444",
                   fontSize: 10,
                 }}
