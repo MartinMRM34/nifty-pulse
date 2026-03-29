@@ -12,8 +12,8 @@
 | P/E, P/B, DY data | 10-year historical via MongoDB | Same | Exists |
 | Percentile calculation | Basic percentile rank | Same + Yield Gap + 200-DMA distance | Extend |
 | Signal system | 5-zone weighted percentile (Deeply Undervalued → Deeply Overvalued) | New Signal Matrix (Strong Buy → Overvalued) with SIP/Lumpsum advice | Rewrite |
-| Real-time data | REST with 1-hour cache | WebSocket via Socket.io for live push | New |
-| Persistence | MongoDB Atlas | Add Supabase/Vercel KV for daily Pulse snapshots | New |
+| Real-time data | REST with 1-hour cache | Next.js revalidation + GitHub Actions cron (free, no WebSockets) | Adjusted |
+| Persistence | MongoDB Atlas | MongoDB for pulse snapshots too (no Supabase needed) | Adjusted |
 | Charts | Recharts Area charts with time range filter | Annotated Charts with 52-week High/Low pins | Extend |
 | Gauge | Flat percentile bar in OverallSignal | 180° Radial Tactical Gauge (speedometer) | Rewrite |
 | Index selection | Button grid (IndexSelector) | Search bar with toggle | Rewrite |
@@ -45,16 +45,17 @@
 - New function `compute200DMA(history)` — calculates 200-day simple moving average of closing P/E
 - New function `computeDistanceFromDMA(current, dma200)` — returns standard deviation distance
 
-### 1.4 — Setup Supabase for Daily Pulse Snapshots
-- Install `@supabase/supabase-js`
-- **New file:** `src/lib/supabase.ts` — Supabase client initialization
-- **New table:** `pulse_snapshots` with schema:
-  ```
-  id | index_id | date | pe_percentile | pb_percentile | dy_percentile |
-  yield_gap | dma_distance | signal | recommended_action | created_at
-  ```
+### 1.4 — Pulse Snapshots in MongoDB (Free, No Supabase)
+- **New collection:** `pulse_snapshots` in existing MongoDB Atlas (free tier)
 - **New file:** `src/data/snapshots.ts` — CRUD functions for pulse snapshots
-- Update `scripts/update_data.py` to write a daily snapshot after computing signals
+- Schema per document:
+  ```
+  { indexId, date, pePercentile, pbPercentile, dyPercentile,
+    yieldGap, dmaDistance, signal: { signal, label, recommendedAction, ... } }
+  ```
+- **New collection:** `gsec_yields` — daily G-Sec yield storage
+- **New file:** `src/data/gsec.ts` — fetch latest G-Sec yield from MongoDB
+- Python pipeline writes snapshots daily after computing signals
 
 ### 1.5 — Update Python Data Pipeline
 - **File:** `scripts/update_data.py`
@@ -190,15 +191,11 @@
 
 **Goal:** Add live data streaming, voice commands, and cultural personalization.
 
-### 4.1 — Socket.io Real-Time Layer
-- Install `socket.io` and `socket.io-client`
-- **New file:** `src/lib/socket.ts` — Socket.io client setup
-- **New API route:** `src/app/api/socket/route.ts` — WebSocket server endpoint
-- Events:
-  - `pulse:update` — pushes new signal when data changes
-  - `price:tick` — live price updates for constituents
-- Client-side: `usePulseSocket()` hook that subscribes and updates state
-- Fallback: if WebSocket fails, fall back to REST polling (current behavior)
+### 4.1 — Data Freshness via Next.js Revalidation (Free, No WebSockets)
+- **Why:** Vercel serverless doesn't support persistent WebSocket connections, and Socket.io adds cost/complexity
+- **Approach:** Use Next.js `unstable_cache` with `revalidate: 3600` (already in place) + on-demand revalidation via `revalidateTag("valuation")` triggered by the Python pipeline after each daily update
+- **Pipeline:** GitHub Actions cron (daily at 4:15 PM IST) → Python script → MongoDB writes → Vercel revalidation POST → Fresh data served
+- **No new dependencies required**
 
 ### 4.2 — Daily Thirukkural Card
 - **New file:** `src/data/thirukkural.ts` — curated list of Porulpaal (Book of Wealth) verses
@@ -250,8 +247,8 @@
 ### 5.1 — End-to-End Integration
 - Connect the new tactical engine to the new UI components
 - Ensure Radial Gauge renders from `getInvestmentStrategy()` output
-- Verify Date-Wise Lookup pulls correct snapshots from Supabase
-- Test WebSocket connection lifecycle (connect, reconnect, fallback)
+- Verify Date-Wise Lookup pulls correct snapshots from MongoDB
+- Test GitHub Actions → MongoDB → Vercel revalidation pipeline end-to-end
 
 ### 5.2 — Performance Optimization
 - Lazy-load heavy components (charts, date picker, voice module)
@@ -277,20 +274,16 @@
 
 | File | Purpose |
 |------|---------|
-| `src/data/gsec.ts` | G-Sec yield data fetching |
-| `src/data/snapshots.ts` | Pulse snapshot CRUD (Supabase) |
-| `src/lib/supabase.ts` | Supabase client |
+| `src/data/gsec.ts` | G-Sec yield fetching from MongoDB |
+| `src/data/snapshots.ts` | Pulse snapshot CRUD (MongoDB) |
 | `src/lib/signals.ts` | Tactical signal engine (v2 logic) |
-| `src/lib/socket.ts` | Socket.io client |
 | `src/lib/voice.ts` | Web Speech API wrapper |
 | `src/components/dashboard/RadialGauge.tsx` | 180° speedometer gauge |
 | `src/components/dashboard/DateLookup.tsx` | Calendar time-travel UI |
 | `src/components/dashboard/ThirukkuralCard.tsx` | Daily wisdom card |
 | `src/components/ui/VoiceTrigger.tsx` | Mic button for voice commands |
 | `src/data/thirukkural.ts` | Curated Porulpaal verse data |
-| `src/app/api/socket/route.ts` | WebSocket server endpoint |
 | `public/manifest.json` | PWA manifest |
-| `public/sw.js` | Service worker |
 
 ## Modified Files Summary
 
@@ -306,15 +299,15 @@
 | `src/components/ui/IndexSelector.tsx` | Rewrite as search bar |
 | `src/components/dashboard/OverallSignal.tsx` | Replace with RadialGauge |
 | `scripts/update_data.py` | G-Sec fetch, snapshot writing, 52-week tracking |
-| `package.json` | New deps: socket.io, @supabase/supabase-js |
+| `.github/workflows/daily-update.yml` | Updated cron with revalidation env vars |
 
-## New Dependencies
+## Cost & Architecture Notes
 
-| Package | Purpose |
-|---------|---------|
-| `socket.io` | WebSocket server |
-| `socket.io-client` | WebSocket client |
-| `@supabase/supabase-js` | Supabase persistence |
+- **No new paid dependencies.** Everything runs on free tiers:
+  - Vercel (free hosting), MongoDB Atlas (free 512MB), GitHub Actions (free 2000 min/month)
+- **No Socket.io / WebSockets.** Vercel serverless doesn't support persistent connections. Data freshness handled by Next.js revalidation + GitHub Actions cron.
+- **No Supabase.** All data (history, snapshots, G-Sec yields, 52W stats) stored in existing MongoDB Atlas.
+- **No IP blocking risk.** NSE data fetched from GitHub Actions runners (GitHub's IP pool), not your machine.
 
 ---
 
