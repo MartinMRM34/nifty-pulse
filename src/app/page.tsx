@@ -1,36 +1,61 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Activity, BellRing, List } from "lucide-react";
-import { IndexId, IndexValuation } from "@/types";
+import { useState, useEffect, useCallback } from "react";
+import { Activity, BellRing, List, Sun, Moon } from "lucide-react";
+import { IndexId, IndexValuation, TacticalSignal } from "@/types";
 import { getIndexValuation } from "@/data";
 import { INDICES } from "@/lib/constants";
+import { getInvestmentStrategy } from "@/lib/signals";
+import { getTodayVerse } from "@/data/thirukkural";
+import { speak } from "@/lib/voice";
 import IndexSelector from "@/components/ui/IndexSelector";
 import MetricCard from "@/components/dashboard/MetricCard";
-import OverallSignal from "@/components/dashboard/OverallSignal";
+import RadialGauge from "@/components/dashboard/RadialGauge";
 import StatsTable from "@/components/dashboard/StatsTable";
 import ConstituentsModal from "@/components/dashboard/ConstituentsModal";
 import AlertModal from "@/components/dashboard/AlertModal";
+import ThirukkuralCard from "@/components/dashboard/ThirukkuralCard";
+import DateLookup from "@/components/dashboard/DateLookup";
+import VoiceTrigger from "@/components/ui/VoiceTrigger";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import dynamic from "next/dynamic";
 
 const ValuationChart = dynamic(() => import("@/components/charts/ValuationChart"), {
   ssr: false,
-  loading: () => <div className="h-64 bg-gray-50 animate-pulse rounded-xl border border-gray-200" />
+  loading: () => <div className="h-64 bg-gray-50 dark:bg-gray-900 animate-pulse rounded-xl border border-gray-200 dark:border-gray-800" />
 });
 
 export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState<IndexId>("nifty-50");
   const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y" | "MAX">("5Y");
   const [valuation, setValuation] = useState<IndexValuation | null>(null);
+  const [signal, setSignal] = useState<TacticalSignal | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   const [isConstituentsModalOpen, setIsConstituentsModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const indexMeta = INDICES.find((i) => i.id === selectedIndex);
 
+  // Dark mode toggle
+  useEffect(() => {
+    const stored = localStorage.getItem("niftypulse-theme");
+    if (stored === "dark") {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  function toggleDarkMode() {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("niftypulse-theme", next ? "dark" : "light");
+  }
+
+  // Data loading
   useEffect(() => {
     async function loadData() {
       if (valuation) {
@@ -42,6 +67,9 @@ export default function Home() {
       try {
         const data = await getIndexValuation(selectedIndex);
         setValuation(data);
+        if (data) {
+          setSignal(getInvestmentStrategy(data));
+        }
       } catch (err) {
         console.error("Error loading dashboard data:", err);
       } finally {
@@ -52,11 +80,25 @@ export default function Home() {
     loadData();
   }, [selectedIndex]);
 
+  // Voice callbacks
+  const handleReadThirukkural = useCallback(() => {
+    const verse = getTodayVerse();
+    speak(verse.english);
+  }, []);
+
+  const handleReadSignal = useCallback(() => {
+    if (signal && indexMeta) {
+      speak(
+        `${indexMeta.name} signal is ${signal.label}. Recommended action: ${signal.recommendedAction}. Confidence is ${signal.confidence}.`
+      );
+    }
+  }, [signal, indexMeta]);
+
   if (isInitialLoading) {
     return <LoadingSpinner fullScreen />;
   }
 
-  if (!valuation || !indexMeta) {
+  if (!valuation || !indexMeta || !signal) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-500">No data available for this index yet.</p>
@@ -65,40 +107,55 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <header className="bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
-              <Activity className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900">Nifty Pulse</h1>
+              <Activity className="h-5 w-5 text-emerald-500" />
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white">Nifty Pulse</h1>
+              <span className="hidden sm:block text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                v2.0
+              </span>
             </div>
-            <span className="hidden sm:block text-xs text-gray-400">
-              Market Valuation Dashboard
-            </span>
+            <div className="flex items-center gap-2">
+              <VoiceTrigger
+                onIndexChange={setSelectedIndex}
+                onReadThirukkural={handleReadThirukkural}
+                onReadSignal={handleReadSignal}
+              />
+              <button
+                onClick={toggleDarkMode}
+                className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 transition-opacity duration-300 ${isFetching ? 'opacity-60 cursor-wait' : 'opacity-100'}`}>
-        {/* Loading Overlay (Optional) */}
+        {/* Loading Overlay */}
         {isFetching && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 backdrop-blur-[1px] pointer-events-none">
-            <div className="bg-white/80 p-4 rounded-2xl shadow-lg border border-blue-100 flex items-center gap-3">
-              <Activity className="h-5 w-5 text-blue-600 animate-pulse" />
-              <span className="text-sm font-bold text-gray-700">Updating...</span>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/30 dark:bg-black/30 backdrop-blur-[1px] pointer-events-none">
+            <div className="bg-white/80 dark:bg-gray-900/80 p-4 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700 flex items-center gap-3">
+              <Activity className="h-5 w-5 text-emerald-500 animate-pulse" />
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Updating...</span>
             </div>
           </div>
         )}
-        {/* Index Selector and Actions */}
+
+        {/* Top Section: Index Selector + Actions */}
         <div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-1">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">
                 {indexMeta.name}
               </h2>
-              <p className="text-sm font-normal text-gray-500">
+              <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
                 {indexMeta.description}
               </p>
             </div>
@@ -106,14 +163,14 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setIsConstituentsModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-sm font-semibold transition-all shadow-sm"
               >
                 <List className="w-4 h-4" />
                 Constituents
               </button>
               <button
                 onClick={() => setIsAlertModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-200 hover:border-blue-300 hover:text-blue-700 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-sm font-semibold transition-all shadow-sm"
               >
                 <BellRing className="w-4 h-4" />
                 Set Alert
@@ -123,8 +180,76 @@ export default function Home() {
           <IndexSelector selected={selectedIndex} onChange={setSelectedIndex} />
         </div>
 
-        {/* Overall Signal */}
-        <OverallSignal valuation={valuation} />
+        {/* Hero: Radial Gauge + Recommendation Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          {/* Radial Gauge */}
+          <div className="lg:col-span-5 bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col items-center justify-center">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 self-start">
+              Tactical Pulse
+            </h3>
+            <RadialGauge signal={signal} />
+            <p className="mt-3 text-[10px] text-gray-400 italic text-center">
+              Based on P/E percentile, 200-DMA distance, and yield gap analysis
+            </p>
+          </div>
+
+          {/* Recommendation + Stats */}
+          <div className="lg:col-span-7 space-y-4">
+            {/* SIP / Lumpsum Recommendation Card */}
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Investment Recommendation
+                </h3>
+                <span className="text-xs text-gray-400">
+                  Last updated: {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Mode</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">{signal.recommendedMode}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Allocation</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">{signal.allocationPercentage}%</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Yield Gap</p>
+                  <p className={`text-sm font-bold ${signal.yieldGap > 0 ? "text-green-600" : "text-red-500"}`}>
+                    {signal.yieldGap > 0 ? "+" : ""}{signal.yieldGap}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Confidence</p>
+                  <p className={`text-sm font-bold ${
+                    signal.confidence === "High" ? "text-green-600" :
+                    signal.confidence === "Medium" ? "text-yellow-600" : "text-red-500"
+                  }`}>
+                    {signal.confidence}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  200-DMA Distance: <span className="font-bold text-gray-700 dark:text-gray-300">{signal.dmaDistance}%</span>
+                  {signal.dmaDistance < -10 && (
+                    <span className="ml-2 text-green-600 font-semibold">Tactical Dip Zone</span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Date Lookup */}
+            <DateLookup valuation={valuation} />
+          </div>
+        </div>
 
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -138,19 +263,22 @@ export default function Home() {
           />
         </div>
 
+        {/* Thirukkural — Market Wisdom */}
+        <ThirukkuralCard />
+
         {/* Charts Section Header */}
-        <div className="pt-4 flex items-center justify-between border-b border-gray-100 pb-2 mb-2">
-          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <div className="pt-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
             Historical Trends
           </h2>
-          <div className="flex bg-gray-100 rounded-xl p-1 shadow-inner">
+          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1 shadow-inner">
             {(["1Y", "3Y", "5Y", "MAX"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${timeRange === range
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-200"
+                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }`}
               >
                 {range}
@@ -159,7 +287,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Major Charts (Full Width) */}
+        {/* Major Charts */}
         <div className="space-y-4">
           <ValuationChart
             data={valuation.history}
@@ -179,8 +307,7 @@ export default function Home() {
           />
         </div>
 
-        {/* Bottom Section: Dividend Yield and Summary Table */}
-        {/* EXPERIMENT HERE: Change the lg:col-span values (total must be 12) to adjust widths */}
+        {/* Bottom: DY Chart + Summary Table */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
           <div className="lg:col-span-5">
             <ValuationChart
@@ -190,7 +317,7 @@ export default function Home() {
               title="Div. Yield"
               color="#10b981"
               timeRange={timeRange}
-              height="h-52" /* Adjust this height to match the table */
+              height="h-52"
             />
           </div>
           <div className="lg:col-span-7">
@@ -199,10 +326,9 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-100">
+        <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-100 dark:border-gray-800">
           <p>
-            Nifty Pulse is for informational purposes only. Not financial advice.
-            Data may be delayed or approximate.
+            Nifty Pulse v2.0 — Tactical Investment Command Center. For informational purposes only. Not financial advice.
           </p>
         </footer>
 
