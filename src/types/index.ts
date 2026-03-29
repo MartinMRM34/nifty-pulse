@@ -102,4 +102,6 @@ export interface ThirukkuralVerse {
   english: string;
   topic: string;
   category?: "BULLISH" | "BEARISH" | "NEUTRAL" | "GENERAL";
+  explanationTamil?: string;
+  explanationEnglish?: string;
 }

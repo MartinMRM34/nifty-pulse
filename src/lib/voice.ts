@@ -91,7 +91,7 @@ export function speak(text: string, lang?: string): void {
     }
   }
 
-  utterance.rate = 0.9;
+  utterance.rate = 0.75;
   utterance.pitch = 1;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);

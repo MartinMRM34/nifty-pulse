@@ -13,6 +13,25 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
 MONGODB_URI = os.getenv("MONGODB_URI", "")
 DB_NAME = "nifty-pulse"
 
+# NSE Inconsistencies: Mapping user-friendly names to specific endpoint names
+PRICE_NAME_MAP = {
+    "NIFTY 50":              "NIFTY 50",
+    "NIFTY NEXT 50":         "Nifty Next 50",
+    "NIFTY MIDCAP 150":      "Nifty Midcap 150",
+    "NIFTY SMALLCAP 250":    "Nifty Smallcap 250",
+    "NIFTY LARGEMIDCAP 250": "NIFTY LARGEMID250",
+    "NIFTY 500":             "NIFTY 500",
+}
+
+VALUATION_NAME_MAP = {
+    "NIFTY 50":              "NIFTY 50",
+    "NIFTY NEXT 50":         "Nifty Next 50",
+    "NIFTY MIDCAP 150":      "NIFTY MIDCAP 150",
+    "NIFTY SMALLCAP 250":    "Nifty Smlcap 250",  # Inconsistent case/naming on NSE
+    "NIFTY LARGEMIDCAP 250": "NIFTY LARGEMID250", # Inconsistent naming on NSE
+    "NIFTY 500":             "NIFTY 500",
+}
+
 def get_db():
     if not MONGODB_URI:
         print("Error: MONGODB_URI not found.")
@@ -141,11 +160,13 @@ def main():
             
             # 1. Fetch Valuation
             time.sleep(1) # Tiny gap
-            val_df = fetch_valuation(index_name, s_str, e_str)
+            v_name = VALUATION_NAME_MAP.get(index_name, index_name)
+            val_df = fetch_valuation(v_name, s_str, e_str)
             time.sleep(args.cooldown)
             
             # 2. Fetch Price
-            price_df = fetch_price(index_name, s_str, e_str)
+            p_name = PRICE_NAME_MAP.get(index_name, index_name)
+            price_df = fetch_price(p_name, s_str, e_str)
             
             if not val_df.empty and not price_df.empty:
                 final_df = pd.merge(val_df, price_df, on='date', how='inner')
