@@ -2,10 +2,18 @@
 
 import { TacticalSignal } from "@/types";
 
+interface StatsData {
+  high?: string;
+  low?: string;
+  close?: string;
+  open?: string;
+}
+
 interface RadialGaugeProps {
   signal: TacticalSignal;
   size?: number;
   value?: string;
+  statsData?: StatsData;
 }
 
 const SIGNAL_COLORS: Record<string, string> = {
@@ -16,14 +24,16 @@ const SIGNAL_COLORS: Record<string, string> = {
   "overvalued": "#ef4444",
 };
 
-export default function RadialGauge({ signal, size = 280, value }: RadialGaugeProps) {
-  // Map percentile (0-100) to angle on the 180° arc
-  // 0 = far left (strong buy), 100 = far right (overvalued)
+export default function RadialGauge({ signal, size = 280, value, statsData }: RadialGaugeProps) {
   const percentile = signal.pePercentile;
   const clampedPct = Math.max(0, Math.min(100, percentile));
-  const needleAngle = -90 + (clampedPct / 100) * 180; // -90° to +90°
+  const needleAngle = -90 + (clampedPct / 100) * 180;
 
-  const cx = size / 2;
+  // When stats are embedded, add horizontal padding so text fits beside the arc ends
+  const SIDE_W = statsData ? size * 0.44 : 0;
+  const totalW = size + 2 * SIDE_W;
+
+  const cx = SIDE_W + size / 2;
   const cy = size * 0.6;
   const radius = size * 0.38;
   const strokeWidth = size * 0.07;
@@ -56,9 +66,22 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
 
   const signalColor = SIGNAL_COLORS[signal.signal] || "#6b7280";
 
+  // Stats text positioning — aligned to the arc endpoints
+  const leftArcX = cx - radius;
+  const rightArcX = cx + radius;
+  const GAP = 12;
+  const labelFs = Math.max(7, size * 0.055);
+  const valueFs = Math.max(8, size * 0.068);
+
+  // Y positions spaced to stay within SVG height (size * 0.7)
+  const yH_label = cy - 24;
+  const yH_value = cy - 11;
+  const yL_label = cy + 2;
+  const yL_value = cy + 15;
+
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size * 0.7} viewBox={`0 0 ${size} ${size * 0.7}`}>
+      <svg width={totalW} height={size * 0.7} viewBox={`0 0 ${totalW} ${size * 0.7}`}>
         {/* Zone arcs */}
         {zones.map((z) => (
           <path
@@ -83,6 +106,57 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
           >
             {value}
           </text>
+        )}
+
+        {/* Embedded Stats — left side: High / Low */}
+        {statsData && (
+          <>
+            {/* HIGH */}
+            <text x={leftArcX - GAP} y={yH_label} textAnchor="end"
+              style={{ fontSize: `${labelFs}px`, fontWeight: 800, letterSpacing: '0.05em', opacity: 0.55 }}
+              className="fill-current text-slate-500 dark:text-slate-400 uppercase">
+              High
+            </text>
+            <text x={leftArcX - GAP} y={yH_value} textAnchor="end"
+              style={{ fontSize: `${valueFs}px`, fontWeight: 800 }}
+              className="fill-emerald-500">
+              {statsData.high || '—'}
+            </text>
+            {/* LOW */}
+            <text x={leftArcX - GAP} y={yL_label} textAnchor="end"
+              style={{ fontSize: `${labelFs}px`, fontWeight: 800, letterSpacing: '0.05em', opacity: 0.55 }}
+              className="fill-current text-slate-500 dark:text-slate-400 uppercase">
+              Low
+            </text>
+            <text x={leftArcX - GAP} y={yL_value} textAnchor="end"
+              style={{ fontSize: `${valueFs}px`, fontWeight: 800 }}
+              className="fill-rose-500">
+              {statsData.low || '—'}
+            </text>
+
+            {/* CLOSE */}
+            <text x={rightArcX + GAP} y={yH_label} textAnchor="start"
+              style={{ fontSize: `${labelFs}px`, fontWeight: 800, letterSpacing: '0.05em', opacity: 0.55 }}
+              className="fill-current text-slate-500 dark:text-slate-400 uppercase">
+              Close
+            </text>
+            <text x={rightArcX + GAP} y={yH_value} textAnchor="start"
+              style={{ fontSize: `${valueFs}px`, fontWeight: 800 }}
+              className="fill-current text-slate-700 dark:text-slate-200">
+              {statsData.close || '—'}
+            </text>
+            {/* OPEN */}
+            <text x={rightArcX + GAP} y={yL_label} textAnchor="start"
+              style={{ fontSize: `${labelFs}px`, fontWeight: 800, letterSpacing: '0.05em', opacity: 0.55 }}
+              className="fill-current text-slate-500 dark:text-slate-400 uppercase">
+              Open
+            </text>
+            <text x={rightArcX + GAP} y={yL_value} textAnchor="start"
+              style={{ fontSize: `${valueFs}px`, fontWeight: 800, opacity: 0.7 }}
+              className="fill-current text-slate-500 dark:text-slate-400">
+              {statsData.open || '—'}
+            </text>
+          </>
         )}
 
         {/* Needle */}

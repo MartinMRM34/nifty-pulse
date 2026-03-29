@@ -2,6 +2,8 @@
  * Web Speech API wrapper for voice commands and text-to-speech.
  */
 
+const VOICE_PREF_KEY = "nifty-pulse-voice-preference";
+
 export interface VoiceCommand {
   pattern: RegExp;
   action: string; // identifier for the command
@@ -34,6 +36,21 @@ export function isSpeechSynthesisSupported(): boolean {
   return "speechSynthesis" in window;
 }
 
+export function getAvailableVoices(): SpeechSynthesisVoice[] {
+  if (typeof window === "undefined") return [];
+  return window.speechSynthesis.getVoices().filter((v) => v.lang.startsWith("en"));
+}
+
+export function getPreferredVoiceName(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(VOICE_PREF_KEY);
+}
+
+export function savePreferredVoiceName(name: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(VOICE_PREF_KEY, name);
+}
+
 export function parseVoiceCommand(transcript: string): string | null {
   for (const cmd of VOICE_COMMANDS) {
     if (cmd.pattern.test(transcript)) {
@@ -43,9 +60,37 @@ export function parseVoiceCommand(transcript: string): string | null {
   return null;
 }
 
-export function speak(text: string): void {
+export function speak(text: string, lang?: string): void {
   if (!isSpeechSynthesisSupported()) return;
   const utterance = new SpeechSynthesisUtterance(text);
+  
+  const voices = window.speechSynthesis.getVoices();
+  
+  if (lang) {
+    // Search for explicit language match
+    const langVoice = voices.find((v) => v.lang.startsWith(lang));
+    if (langVoice) {
+      utterance.voice = langVoice;
+      utterance.lang = lang;
+    }
+  } else {
+    // English preference logic
+    const prefName = getPreferredVoiceName();
+    if (prefName) {
+      const preferred = voices.find((v) => v.name === prefName);
+      if (preferred) utterance.voice = preferred;
+    } else {
+      // Smart default: prioritize Google High quality English voices
+      const googleVoice = voices.find(
+        (v) => v.name.includes("Google") && v.lang.startsWith("en")
+      ) || voices.find(
+        (v) => (v.name.includes("Premium") || v.name.includes("Enhanced")) && v.lang.startsWith("en")
+      ) || voices.find((v) => v.lang.startsWith("en"));
+      
+      if (googleVoice) utterance.voice = googleVoice;
+    }
+  }
+
   utterance.rate = 0.9;
   utterance.pitch = 1;
   window.speechSynthesis.cancel();
@@ -57,6 +102,7 @@ export type SpeechRecognitionType = typeof window extends { SpeechRecognition: i
 export function createSpeechRecognition(
   onResult: (transcript: string) => void,
   onEnd: () => void,
+  onError?: (error: string) => void,
 ): { start: () => void; stop: () => void } | null {
   if (!isSpeechRecognitionSupported()) return null;
 
@@ -79,7 +125,11 @@ export function createSpeechRecognition(
   };
 
   recognition.onend = () => onEnd();
-  recognition.onerror = () => onEnd();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recognition.onerror = (event: any) => {
+    if (onError) onError(event.error);
+    onEnd();
+  };
 
   return {
     start: () => recognition.start(),

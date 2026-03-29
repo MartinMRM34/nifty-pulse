@@ -123,60 +123,34 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                   year: "numeric",
                 })}
               </p>
-              
-              <div className="flex items-center justify-between gap-1 overflow-visible">
+
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigate("prev")}
                   disabled={!canGoPrev}
-                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all group flex flex-col items-center gap-1 shrink-0"
+                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all shrink-0"
                   title="Previous Day"
                 >
                   <ChevronLeft className={DS.ICON.MD} />
                 </button>
 
-                {/* Left side stats: High / Low */}
-                <div className="flex flex-col gap-4 text-right min-w-[70px] shrink-0">
-                  <div className="space-y-0.5">
-                    <p className={DS.TEXT.MUTED_CAPS_TIGHT + " opacity-70"}>High</p>
-                    <p className="text-sm font-black text-emerald-500">
-                      {selectedSnapshot?.high?.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className={DS.TEXT.MUTED_CAPS_TIGHT + " opacity-70"}>Low</p>
-                    <p className="text-sm font-black text-rose-500">
-                      {selectedSnapshot?.low?.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0 flex justify-center scale-110">
-                  <RadialGauge 
-                    signal={historicalSignal} 
-                    size={180} 
+                <div className="flex-1 flex justify-center min-w-0">
+                  <RadialGauge
+                    signal={historicalSignal}
+                    size={150}
+                    statsData={{
+                      high: selectedSnapshot?.high?.toLocaleString("en-IN"),
+                      low: selectedSnapshot?.low?.toLocaleString("en-IN"),
+                      close: selectedSnapshot?.close?.toLocaleString("en-IN"),
+                      open: selectedSnapshot?.open?.toLocaleString("en-IN") || undefined,
+                    }}
                   />
-                </div>
-
-                {/* Right side stats: Close / Open */}
-                <div className="flex flex-col gap-4 text-left min-w-[80px] shrink-0">
-                  <div className="space-y-0.5">
-                    <p className={DS.TEXT.MUTED_CAPS_TIGHT + " opacity-70"}>Close</p>
-                    <p className={`${DS.TEXT.BODY_STRONG}`}>
-                      {selectedSnapshot?.close?.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <p className={DS.TEXT.MUTED_CAPS_TIGHT + " opacity-70"}>Open</p>
-                    <p className="text-sm font-black text-muted">
-                      {selectedSnapshot?.open?.toLocaleString("en-IN") || "-"}
-                    </p>
-                  </div>
                 </div>
 
                 <button
                   onClick={() => navigate("next")}
                   disabled={!canGoNext}
-                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all group flex flex-col items-center gap-1 shrink-0"
+                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all shrink-0"
                   title="Next Day"
                 >
                   <ChevronRight className={DS.ICON.MD} />

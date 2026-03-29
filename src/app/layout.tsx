@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import TouchHoverProvider from "@/components/ui/TouchHoverProvider";
 
 export const metadata: Metadata = {
   title: "Nifty Pulse - Tactical Investment Command Center",
@@ -29,7 +30,10 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <TouchHoverProvider />
+        {children}
+      </body>
     </html>
   );
 }

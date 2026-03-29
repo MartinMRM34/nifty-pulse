@@ -17,7 +17,7 @@ export const DS = {
   // Card & Surfaces
   CARD: {
     BASE: "bg-card rounded-2xl border border-border/50 transition-all duration-300 group",
-    INTERACTIVE: "hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30",
+    INTERACTIVE: "card-interactive hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 touch-manipulation",
     P6: "p-6",
     P5: "p-5",
     P4: "p-4",

@@ -166,7 +166,7 @@ export default function Home() {
   }
 
   return (
-    <div className={`min-h-screen bg-[var(--background)] ${DS.ANIM.TRANSITION}`}>
+    <div className={`min-h-screen w-full overflow-x-hidden bg-[var(--background)] ${DS.ANIM.TRANSITION}`}>
       {/* Header */}
       <header className={DS.LAYOUT.HEADER}>
         <div className={DS.LAYOUT.PAGE}>
