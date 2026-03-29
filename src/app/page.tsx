@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Activity, BellRing, List, Sun, Moon, SunMoon } from "lucide-react";
 import { IndexId, IndexValuation, TacticalSignal } from "@/types";
 import { getIndexValuation } from "@/data";
+import { getGSecYield, GSecData } from "@/data/market";
 import { INDICES } from "@/lib/constants";
 import { getInvestmentStrategy } from "@/lib/signals";
 import { getTodayVerse } from "@/data/thirukkural";
@@ -32,6 +33,7 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState<"1Y" | "3Y" | "5Y" | "MAX">("3Y");
   const [valuation, setValuation] = useState<IndexValuation | null>(null);
   const [signal, setSignal] = useState<TacticalSignal | null>(null);
+  const [gsecData, setGsecData] = useState<GSecData | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [themeMode, setThemeMode] = useState<"light" | "dark" | "auto">("auto");
@@ -103,10 +105,16 @@ export default function Home() {
       }
 
       try {
-        const data = await getIndexValuation(selectedIndex);
-        setValuation(data);
-        if (data) {
-          setSignal(getInvestmentStrategy(data));
+        const [indexData, bondData] = await Promise.all([
+          getIndexValuation(selectedIndex),
+          getGSecYield()
+        ]);
+
+        setValuation(indexData);
+        setGsecData(bondData);
+        
+        if (indexData) {
+          setSignal(getInvestmentStrategy(indexData, bondData));
         }
       } catch (err) {
         console.error("Error loading dashboard data:", err);
@@ -316,8 +324,19 @@ export default function Home() {
                   <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Allocation</p>
                   <p className={DS.TEXT.BODY_STRONG}>{signal.allocationPercentage}%</p>
                 </div>
-                <div>
-                  <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Yield Gap</p>
+                <div className="group relative">
+                  <div className="flex items-center gap-1.5 mb-1 opacity-70 cursor-help">
+                    <p className={DS.TEXT.MUTED_CAPS_TIGHT}>Yield Gap</p>
+                    <div className="p-0.5 rounded-full bg-muted/10 group-hover:bg-blue-500/10 group-hover:text-blue-500 transition-colors">
+                      <Activity className="w-2.5 h-2.5" />
+                    </div>
+                  </div>
+                  <div className="invisible group-hover:visible absolute bottom-full left-0 mb-2 w-48 p-3 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-20 animate-in fade-in zoom-in duration-200">
+                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Formula</p>
+                    <p className="text-[11px] text-white font-medium leading-relaxed">
+                      Yield Gap = (1 / P.E × 100) — <span className="text-emerald-400">{signal.gsecYield}%</span> G-Sec
+                    </p>
+                  </div>
                   <p className={`${DS.TEXT.BODY_STRONG} ${signal.yieldGap > 0 ? "text-emerald-500" : "text-rose-500"}`}>
                     {signal.yieldGap > 0 ? "+" : ""}{signal.yieldGap}%
                   </p>
@@ -332,13 +351,20 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-border">
+              <div className="mt-4 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3">
                 <p className={`${DS.TEXT.BODY} text-muted`}>
                   200-DMA Distance: <span className={DS.TEXT.BODY_STRONG}>{signal.dmaDistance}%</span>
                   {signal.dmaDistance < -10 && (
                     <span className="ml-2 text-emerald-500 font-bold">Tactical Dip Zone</span>
                   )}
                 </p>
+
+                {signal.isGsecFallback && (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-500/5 border border-rose-500/20 text-[10px] animate-pulse">
+                    <span className="text-rose-500 font-black uppercase tracking-tighter">⚠️ Fetch Failed:</span>
+                    <span className="text-muted opacity-70">Standard {signal.gsecYield}% used for Yield Gap result.</span>
+                  </div>
+                )}
               </div>
             </div>
 

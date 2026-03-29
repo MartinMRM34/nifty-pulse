@@ -93,7 +93,7 @@ function getConfidence(pePercentile: number, yieldGap: number, dmaDistance: numb
  */
 export function getInvestmentStrategy(
   valuation: IndexValuation,
-  gsecYield: number = 7.0,
+  gsecData: { yield: number; isFallback: boolean } = { yield: 7.0, isFallback: true },
 ): TacticalSignal {
   const pePercentile = valuation.pe.percentile;
   const currentPE = valuation.pe.current;
@@ -102,7 +102,7 @@ export function getInvestmentStrategy(
   const peHistory = valuation.history.map((h) => h.pe);
   const dma200 = compute200DMA(peHistory);
   const dmaDistance = computeDMADistance(currentPE, dma200);
-  const yieldGap = computeYieldGap(currentPE, gsecYield);
+  const yieldGap = computeYieldGap(currentPE, gsecData.yield);
 
   // Determine signal
   let signal: Signal;
@@ -138,5 +138,7 @@ export function getInvestmentStrategy(
     yieldGap,
     dmaDistance,
     pePercentile,
+    gsecYield: gsecData.yield,
+    isGsecFallback: gsecData.isFallback,
   };
 }

@@ -79,6 +79,8 @@ export interface TacticalSignal {
   yieldGap: number;
   dmaDistance: number;
   pePercentile: number;
+  gsecYield: number;
+  isGsecFallback: boolean;
 }
 
 export interface PulseSnapshot {
