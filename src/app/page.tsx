@@ -9,6 +9,7 @@ import { getInvestmentStrategy } from "@/lib/signals";
 import { getTodayVerse } from "@/data/thirukkural";
 import { speak } from "@/lib/voice";
 import { IndexChips } from "@/components/ui/IndexSelector";
+import { DS } from "@/lib/design-system";
 import IndexSelector from "@/components/ui/IndexSelector";
 import MetricCard from "@/components/dashboard/MetricCard";
 import RadialGauge from "@/components/dashboard/RadialGauge";
@@ -165,16 +166,16 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className={`min-h-screen bg-[var(--background)] ${DS.ANIM.TRANSITION}`}>
       {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-20 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className={DS.LAYOUT.HEADER}>
+        <div className={DS.LAYOUT.PAGE}>
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
-              <Activity className="h-5 w-5 text-emerald-500" />
-              <h1 className="text-lg font-bold text-foreground">Nifty Pulse</h1>
-              <span className="hidden sm:block text-[10px] text-muted font-medium uppercase tracking-wider">
-                v2.0
+              <Activity className={`${DS.ICON.MD} text-emerald-500`} />
+              <h1 className={DS.TEXT.H1}>Nifty Pulse</h1>
+              <span className={`hidden sm:block ${DS.TEXT.MUTED_CAPS} opacity-40`}>
+                v3.0 SSOT
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -186,22 +187,22 @@ export default function Home() {
               <div className="flex items-center bg-background border border-border rounded-full p-1 shadow-sm">
                 <button
                   onClick={cycleThemeMode}
-                  className={`p-1.5 rounded-full transition-all group relative ${
+                  className={`p-1.5 rounded-full ${DS.ANIM.TRANSITION} group relative ${
                     themeMode === "auto" ? "text-blue-500" : "text-muted hover:text-foreground"
                   }`}
                   title={`Mode: ${themeMode.toUpperCase()} (Click to cycle)`}
                 >
                   <div className="relative">
                     {themeMode === "auto" ? (
-                      <SunMoon className="w-4 h-4" />
+                      <SunMoon className={DS.ICON.SM} />
                     ) : themeMode === "dark" ? (
-                      <Moon className="w-4 h-4" />
+                      <Moon className={DS.ICON.SM} />
                     ) : (
-                      <Sun className="w-4 h-4" />
+                      <Sun className={DS.ICON.SM} />
                     )}
                     {themeMode === "auto" && (
                       <div className="absolute -top-1.5 -right-1.5 flex h-3 w-3 items-center justify-center">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
+                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20`}></span>
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600 text-[6px] font-black text-white items-center justify-center border border-white/20">A</span>
                       </div>
                     )}
@@ -213,13 +214,13 @@ export default function Home() {
         </div>
       </header>
 
-      <main className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 transition-opacity duration-300 ${isFetching ? 'opacity-60 cursor-wait' : 'opacity-100'}`}>
+      <main className={`${DS.LAYOUT.MAIN} ${isFetching ? 'opacity-60 cursor-wait' : 'opacity-100'}`}>
         {/* Loading Overlay */}
         {isFetching && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/30 backdrop-blur-[1px] pointer-events-none">
-            <div className="bg-card/80 p-4 rounded-2xl shadow-lg border border-blue-100 dark:border-border flex items-center gap-3">
-              <Activity className="h-5 w-5 text-emerald-500 animate-pulse" />
-              <span className="text-sm font-bold text-foreground">Updating...</span>
+            <div className={`${DS.CARD.BASE} p-4 flex items-center gap-3 shadow-lg border-blue-100 dark:border-border`}>
+              <Activity className={`${DS.ICON.MD} text-emerald-500 ${DS.ANIM.PULSE}`} />
+              <span className={`${DS.TEXT.BODY_STRONG}`}>Updating...</span>
             </div>
           </div>
         )}
@@ -229,10 +230,10 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
               <div>
-                <h2 className="text-lg font-bold text-foreground whitespace-nowrap">
+                <h2 className={DS.TEXT.H1 + " whitespace-nowrap"}>
                   {indexMeta.name}
                 </h2>
-                <p className="hidden sm:block text-[10px] font-medium text-muted max-w-[200px] truncate">
+                <p className={`hidden sm:block ${DS.TEXT.MUTED_CAPS_TIGHT} max-w-[200px] truncate`}>
                   {indexMeta.description}
                 </p>
               </div>
@@ -245,32 +246,31 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setIsConstituentsModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-card text-foreground border border-border hover:border-blue-400 hover:text-blue-500 rounded-xl text-xs font-semibold transition-all shadow-sm group"
+                className={DS.BUTTON.SECONDARY}
               >
-                <List className="w-4 h-4 text-muted group-hover:text-blue-500" />
+                <List className={`${DS.ICON.SM} text-muted group-hover:text-blue-500`} />
                 Constituents
               </button>
               <button
                 onClick={() => setIsAlertModalOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-card text-foreground border border-border hover:border-blue-400 hover:text-blue-500 rounded-xl text-xs font-semibold transition-all shadow-sm group"
+                className={DS.BUTTON.SECONDARY}
               >
-                <BellRing className="w-4 h-4 text-muted group-hover:text-blue-500" />
+                <BellRing className={`${DS.ICON.SM} text-muted group-hover:text-blue-500`} />
                 Set Alert
               </button>
             </div>
           </div>
-          {/* <IndexSelector selected={selectedIndex} onChange={setSelectedIndex} /> */}
         </div>
 
         {/* Hero: Radial Gauge + Recommendation Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className={DS.LAYOUT.GRID_HERO}>
           {/* Radial Gauge */}
-          <div className="lg:col-span-5 bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col items-center justify-center hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
+          <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE} flex flex-col items-center justify-center lg:col-span-5`}>
             <div className="w-full flex items-center justify-between mb-2">
-              <h3 className="text-xs font-bold text-muted uppercase tracking-wider">
+              <h3 className={DS.TEXT.LABEL}>
                 Tactical Pulse
               </h3>
-              <span className="text-[10px] font-bold text-muted opacity-60">
+              <span className={DS.TEXT.MUTED_CAPS_TIGHT}>
                 {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
@@ -285,7 +285,7 @@ export default function Home() {
               value={valuation.history[valuation.history.length - 1].close?.toLocaleString("en-IN")} 
             />
 
-            <p className="mt-3 text-[10px] text-gray-400 italic text-center">
+            <p className={`mt-3 ${DS.TEXT.TINY} italic text-center opacity-60`}>
               Based on P/E percentile, 200-DMA distance, and yield gap analysis
             </p>
           </div>
@@ -293,12 +293,12 @@ export default function Home() {
           {/* Recommendation + Stats */}
           <div className="lg:col-span-7 space-y-4">
             {/* SIP / Lumpsum Recommendation Card */}
-            <div className="bg-card rounded-2xl border border-border p-5 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
+            <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${DS.CARD.INTERACTIVE}`}>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs font-bold text-muted uppercase tracking-wider">
+                <h3 className={DS.TEXT.LABEL}>
                   Investment Recommendation
                 </h3>
-                <span className="text-[10px] font-bold text-muted opacity-60">
+                <span className={DS.TEXT.MUTED_CAPS_TIGHT}>
                   Last updated: {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
                     day: "numeric",
                     month: "short",
@@ -309,22 +309,22 @@ export default function Home() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Mode</p>
-                  <p className="text-sm font-bold text-foreground">{signal.recommendedMode}</p>
+                  <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Mode</p>
+                  <p className={DS.TEXT.BODY_STRONG}>{signal.recommendedMode}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Allocation</p>
-                  <p className="text-sm font-bold text-foreground">{signal.allocationPercentage}%</p>
+                  <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Allocation</p>
+                  <p className={DS.TEXT.BODY_STRONG}>{signal.allocationPercentage}%</p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Yield Gap</p>
-                  <p className={`text-sm font-bold ${signal.yieldGap > 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                  <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Yield Gap</p>
+                  <p className={`${DS.TEXT.BODY_STRONG} ${signal.yieldGap > 0 ? "text-emerald-500" : "text-rose-500"}`}>
                     {signal.yieldGap > 0 ? "+" : ""}{signal.yieldGap}%
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-muted uppercase tracking-wider mb-1 font-bold">Confidence</p>
-                  <p className={`text-sm font-bold ${signal.confidence === "High" ? "text-emerald-500" :
+                  <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} mb-1 opacity-70`}>Confidence</p>
+                  <p className={`${DS.TEXT.BODY_STRONG} ${signal.confidence === "High" ? "text-emerald-500" :
                     signal.confidence === "Medium" ? "text-amber-500" : "text-rose-500"
                     }`}>
                     {signal.confidence}
@@ -333,8 +333,8 @@ export default function Home() {
               </div>
 
               <div className="mt-4 pt-3 border-t border-border">
-                <p className="text-xs text-muted">
-                  200-DMA Distance: <span className="font-bold text-foreground">{signal.dmaDistance}%</span>
+                <p className={`${DS.TEXT.BODY} text-muted`}>
+                  200-DMA Distance: <span className={DS.TEXT.BODY_STRONG}>{signal.dmaDistance}%</span>
                   {signal.dmaDistance < -10 && (
                     <span className="ml-2 text-emerald-500 font-bold">Tactical Dip Zone</span>
                   )}
@@ -351,7 +351,7 @@ export default function Home() {
         <ThirukkuralCard signal={signal.signal} />
 
         {/* Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={DS.LAYOUT.GRID_DASHBOARD}>
           <MetricCard title="P/E Ratio" stats={valuation.pe} unit="x" />
           <MetricCard title="P/B Ratio" stats={valuation.pb} unit="x" />
           <MetricCard
@@ -364,7 +364,7 @@ export default function Home() {
 
         {/* Charts Section Header */}
         <div className="pt-4 flex items-center justify-between border-b border-border pb-2 mb-2">
-          <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <h2 className={`${DS.TEXT.H1} flex items-center gap-2`}>
             Historical Trends
           </h2>
           <div className="flex bg-background border border-border rounded-xl p-1 shadow-inner">
@@ -372,7 +372,7 @@ export default function Home() {
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${timeRange === range
+                className={`px-4 py-1.5 text-xs font-bold rounded-lg ${DS.ANIM.TRANSITION} ${timeRange === range
                   ? "bg-card text-blue-500 shadow-sm border border-border"
                   : "text-muted hover:text-foreground"
                   }`}
@@ -404,7 +404,7 @@ export default function Home() {
         </div>
 
         {/* Bottom: DY Chart + Summary Table */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div className={DS.LAYOUT.GRID_STATS}>
           <div className="lg:col-span-5">
             <ValuationChart
               data={valuation.history}
@@ -422,9 +422,9 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center text-[10px] text-muted py-8 border-t border-border opacity-50">
-          <p className="font-medium">
-            Nifty Pulse v2.0 — Tactical Investment Command Center. For informational purposes only. Not financial advice.
+        <footer className="text-center py-8 border-t border-border opacity-50">
+          <p className={`${DS.TEXT.MUTED_CAPS_TIGHT}`}>
+            Nifty Pulse v3.0 SSOT — Tactical Investment Command Center. For informational purposes only. Not financial advice.
           </p>
         </footer>
 

@@ -11,6 +11,8 @@ interface MetricCardProps {
   invertedSignal?: boolean; // true for dividend yield (higher = better)
 }
 
+import { DS } from "@/lib/design-system";
+
 export default function MetricCard({ title, stats, unit = "x", invertedSignal = false }: MetricCardProps) {
   const zone = getZone(invertedSignal ? 100 - stats.percentile : stats.percentile);
   const diffFromMedian = stats.current - stats.median;
@@ -20,9 +22,9 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
   const TrendIcon = Math.abs(diffFromMedian) < 0.1 ? Minus : isAboveMedian ? TrendingUp : TrendingDown;
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE}`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xs font-bold text-muted uppercase tracking-wider">{title}</h3>
+        <h3 className={DS.TEXT.LABEL}>{title}</h3>
         <span
           className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${zone.bgColor} ${zone.textColor} border border-black/5 dark:border-white/5`}
         >
@@ -31,10 +33,10 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
       </div>
 
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-3xl font-black text-foreground tracking-tight">
+        <span className={DS.TEXT.VALUE}>
           {stats.current.toFixed(2)}
         </span>
-        <span className="text-sm font-bold text-muted opacity-50">{unit}</span>
+        <span className={DS.TEXT.SUBVALUE}>{unit}</span>
       </div>
 
       <div className="flex items-center gap-1.5 mb-5">
@@ -93,7 +95,7 @@ export default function MetricCard({ title, stats, unit = "x", invertedSignal = 
           </div>
           <div className="w-full bg-background rounded-full h-1.5 border border-border/50">
             <div
-              className="h-1.5 rounded-full transition-all duration-700 ease-out shadow-[0_0_8px] shadow-current"
+              className={`h-1.5 rounded-full ${DS.ANIM.TRANSITION} duration-700 ease-out shadow-[0_0_8px] shadow-current`}
               style={{
                 width: `${stats.percentile}%`,
                 backgroundColor: zone.color,

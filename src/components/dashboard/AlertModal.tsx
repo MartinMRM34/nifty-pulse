@@ -4,6 +4,7 @@ import { useState } from "react";
 import { IndexId } from "@/types";
 import { INDICES, ZONES } from "@/lib/constants";
 import { X, BellRing, CheckCircle2 } from "lucide-react";
+import { DS } from "@/lib/design-system";
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -32,17 +33,17 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-card rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-border">
+    <div className={DS.MODAL.OVERLAY}>
+      <div className={DS.MODAL.CONTENT}>
         {submitted ? (
           <div className="p-10 text-center space-y-6">
-            <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-              <CheckCircle2 className="w-10 h-10" />
+            <div className={`w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner border border-emerald-500/10`}>
+              <CheckCircle2 className={DS.ICON.LG} />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-foreground tracking-tight">Alert Activated</h2>
-              <p className="text-muted font-medium">
-                We&apos;ll notify <span className="text-foreground font-bold">{email}</span> when <span className="text-foreground font-bold">{indexMeta?.name}</span> enters the selected zone.
+              <h2 className={DS.TEXT.H1}>Alert Activated</h2>
+              <p className={DS.TEXT.BODY}>
+                We&apos;ll notify <span className={DS.TEXT.BODY_STRONG}>{email}</span> when <span className={DS.TEXT.BODY_STRONG}>{indexMeta?.name}</span> enters the selected zone.
               </p>
             </div>
             <button
@@ -54,39 +55,39 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between p-6 border-b border-border bg-card/50 backdrop-blur-sm">
+            <div className={DS.MODAL.HEADER}>
               <div className="flex items-center gap-4">
                 <div className="p-2.5 bg-blue-500/10 text-blue-500 rounded-xl border border-blue-500/20">
-                  <BellRing className="w-5 h-5" />
+                  <BellRing className={DS.ICON.MD} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Create Alert</h2>
-                  <p className="text-[10px] text-muted font-black uppercase tracking-widest opacity-60">{indexMeta?.name}</p>
+                  <h2 className={DS.TEXT.H1 + " uppercase"}>Create Alert</h2>
+                  <p className={DS.TEXT.MUTED_CAPS}>{indexMeta?.name}</p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
                 className="p-2 text-muted hover:text-foreground hover:bg-background rounded-full transition-all"
               >
-                <X className="w-5 h-5" />
+                <X className={DS.ICON.MD} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-8 space-y-8">
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Email Address</label>
+                <label className={DS.TEXT.MUTED_CAPS + " ml-1"}>Email Address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-5 py-4 rounded-2xl border border-border bg-background text-foreground focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-muted/40 font-bold"
+                  className={DS.INPUT.BASE + " px-5 py-4"}
                 />
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Target Zone</label>
+                <label className={DS.TEXT.MUTED_CAPS + " ml-1"}>Target Zone</label>
                 <div className="grid grid-cols-1 gap-2.5">
                   {ZONES.slice(0, 3).map((z) => (
                     <button
@@ -100,7 +101,7 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 rounded-full ${z.bgColor}`} />
+                        <div className={`${DS.DOT.MD} rounded-full ${z.bgColor}`} />
                         <span className={`font-black uppercase tracking-widest text-[10px] ${targetZone === z.zone ? "text-blue-500" : "text-foreground"}`}>
                           {z.label}
                         </span>
@@ -108,7 +109,7 @@ export default function AlertModal({ isOpen, onClose, indexId }: AlertModalProps
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         targetZone === z.zone ? "border-blue-500 bg-blue-500" : "border-border"
                       }`}>
-                        {targetZone === z.zone && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        {targetZone === z.zone && <div className={`${DS.DOT.SM} bg-white rounded-full`} />}
                       </div>
                     </button>
                   ))}

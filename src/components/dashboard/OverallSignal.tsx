@@ -2,6 +2,7 @@
 
 import { IndexValuation, Zone } from "@/types";
 import { getZone, ZONES } from "@/lib/constants";
+import { DS } from "@/lib/design-system";
 
 interface OverallSignalProps {
   valuation: IndexValuation;
@@ -32,12 +33,12 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group">
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE}`}>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-[10px] font-black text-muted uppercase tracking-widest opacity-60">
+        <h3 className={DS.TEXT.MUTED_CAPS}>
           Overall Market Signal
         </h3>
-        <span className="text-[10px] text-muted font-bold opacity-40 italic">
+        <span className={DS.TEXT.TINY}>
           Last updated: {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
             day: "numeric",
             month: "short",
@@ -55,26 +56,26 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
         </div>
         <div className="flex-1">
           <p className={`text-xl font-black uppercase tracking-tight ${zone.textColor}`}>{zone.label}</p>
-          <p className="text-sm text-muted font-medium mt-1 leading-relaxed opacity-80">{signalMessage[zone.zone]}</p>
+          <p className={`${DS.TEXT.BODY} mt-1 opacity-80`}>{signalMessage[zone.zone]}</p>
         </div>
       </div>
 
       {latestSnapshot?.close && (
         <div className="mb-8 grid grid-cols-3 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
           <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-blue-400">
-            <p className="text-[9px] text-muted font-black uppercase tracking-tighter opacity-60 mb-1">Index Price</p>
-            <p className="text-base font-black text-foreground">
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Index Price</p>
+            <p className={DS.TEXT.H2}>
               {latestSnapshot.close.toLocaleString("en-IN")}
             </p>
           </div>
           <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-emerald-400">
-            <p className="text-[9px] text-muted font-black uppercase tracking-tighter opacity-60 mb-1">Day High</p>
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Day High</p>
             <p className="text-base font-black text-emerald-500">
               {latestSnapshot.high?.toLocaleString("en-IN")}
             </p>
           </div>
           <div className="bg-background rounded-xl p-4 text-center border border-border transition-all hover:border-rose-400">
-            <p className="text-[9px] text-muted font-black uppercase tracking-tighter opacity-60 mb-1">Day Low</p>
+            <p className={DS.TEXT.MUTED_CAPS_TIGHT + " mb-1"}>Day Low</p>
             <p className="text-base font-black text-rose-500">
               {latestSnapshot.low?.toLocaleString("en-IN")}
             </p>
@@ -105,7 +106,7 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           </div>
           {/* Indicator Dot */}
           <div
-            className="absolute top-1/2 w-7 h-7 bg-white dark:bg-slate-200 border-[4px] border-slate-900 rounded-full shadow-xl transition-all duration-700 ease-out z-10"
+            className={`absolute top-1/2 ${DS.DOT.XL} bg-white dark:bg-slate-200 border-[4px] border-slate-900 rounded-full shadow-xl ${DS.ANIM.TRANSITION} duration-700 ease-out z-10`}
             style={{
               left: `${Math.max(0, Math.min(100, overallPercentile))}%`,
               transform: "translate(-50%, -50%)",
@@ -113,8 +114,8 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           />
         </div>
         <div className="flex justify-between mt-6">
-          <span className="text-[9px] font-black text-muted uppercase tracking-widest opacity-40">Undervalued</span>
-          <span className="text-[9px] font-black text-muted uppercase tracking-widest opacity-40">Overvalued</span>
+          <span className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-40`}>Undervalued</span>
+          <span className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-40`}>Overvalued</span>
         </div>
       </div>
     </div>

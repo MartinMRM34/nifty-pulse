@@ -9,10 +9,10 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
-  Legend,
 } from "recharts";
 import { ValuationSnapshot } from "@/types";
 import { useMemo } from "react";
+import { DS } from "@/lib/design-system";
 
 interface ValuationChartProps {
   data: ValuationSnapshot[];
@@ -100,16 +100,16 @@ export default function ValuationChart({
   }));
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-6 shadow-sm flex flex-col h-full hover:shadow-xl hover:scale-[1.005] transition-all duration-500 group">
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE} flex flex-col h-full`}>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-[10px] font-black text-muted uppercase tracking-widest opacity-60">
+          <h3 className={DS.TEXT.MUTED_CAPS}>
             {title}
           </h3>
-          <p className="text-[9px] text-muted font-bold opacity-30 mt-0.5 uppercase tracking-tighter">Rolling {timeRange} Analysis</p>
+          <p className={`${DS.TEXT.MUTED_CAPS_TIGHT} opacity-30 mt-0.5 whitespace-nowrap`}>Rolling {timeRange} Analysis</p>
         </div>
         {week52 && (
-          <div className="flex gap-4 text-[9px] font-black uppercase tracking-widest">
+          <div className={`flex gap-4 ${DS.TEXT.TINY_CAPS} font-black`}>
             <span className="flex flex-col items-end">
               <span className="opacity-40 mb-0.5">52W High</span>
               <span className="text-rose-500">{week52.high.toFixed(2)}</span>
@@ -164,7 +164,7 @@ export default function ValuationChart({
               formatter={(value) => [Number(value).toFixed(2), metricLabels[metric]]}
               labelFormatter={(_, payload) => {
                 if (payload && payload.length > 0) {
-                  return <span className="text-muted text-[10px] font-black uppercase tracking-widest">{payload[0].payload.fullDate}</span>;
+                  return <span className={`${DS.TEXT.MUTED_CAPS} opacity-100`}>{payload[0].payload.fullDate}</span>;
                 }
                 return "";
               }}

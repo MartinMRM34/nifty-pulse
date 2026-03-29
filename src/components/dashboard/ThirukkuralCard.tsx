@@ -3,6 +3,7 @@
 import { getTodayVerse } from "@/data/thirukkural";
 import { BookOpen } from "lucide-react";
 import { Signal } from "@/types";
+import { DS } from "@/lib/design-system";
 
 interface ThirukkuralCardProps {
   signal?: Signal;
@@ -31,16 +32,16 @@ export default function ThirukkuralCard({ signal }: ThirukkuralCardProps) {
   }[verse.category || "GENERAL"];
 
   return (
-    <div className={`bg-card rounded-2xl border border-border/50 p-5 shadow-sm hover:shadow-2xl hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group ${categoryStyles}`}>
+    <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${DS.CARD.INTERACTIVE} ${categoryStyles}`}>
       <div className="flex items-center gap-2 mb-4">
-        <BookOpen className={`w-4 h-4 opacity-80 ${verse.category === 'BEARISH' ? 'text-rose-500' : verse.category === 'BULLISH' ? 'text-emerald-500' : 'text-amber-500'}`} />
-        <h3 className={`text-[10px] font-black uppercase tracking-widest ${
+        <BookOpen className={`${DS.ICON.SM} opacity-80 ${verse.category === 'BEARISH' ? 'text-rose-500' : verse.category === 'BULLISH' ? 'text-emerald-500' : 'text-amber-500'}`} />
+        <h3 className={`${DS.TEXT.MUTED_CAPS} ${
           verse.category === 'BEARISH' ? 'text-rose-600 dark:text-rose-400' : 
           verse.category === 'BULLISH' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
         }`}>
           Market Wisdom — Thirukkural #{verse.number}
         </h3>
-        <span className="ml-auto text-[10px] text-muted font-bold opacity-60 uppercase tracking-tighter">{verse.topic}</span>
+        <span className={`ml-auto ${DS.TEXT.MUTED_CAPS_TIGHT} opacity-60`}>{verse.topic}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
@@ -56,7 +57,7 @@ export default function ThirukkuralCard({ signal }: ThirukkuralCardProps) {
 
         {/* English — Right Column */}
         <div className="flex items-center md:border-l md:border-border md:pl-8">
-          <p className="text-sm text-muted font-medium leading-relaxed italic opacity-80">
+          <p className={`${DS.TEXT.BODY} italic opacity-80`}>
             &ldquo;{verse.english}&rdquo;
           </p>
         </div>
