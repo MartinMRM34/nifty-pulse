@@ -46,14 +46,22 @@ body {
 }
 
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.5) brightness(1.5);
+/* Aggressively hide all native date picker UI elements to prevent duplication with our Lucide icon */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure the input itself triggers the picker on click if possible */
+input[type="date"] {
   cursor: pointer;
 }
 
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(1.5);
-}
+
 
 /* Silky scrollbar */
 .custom-scrollbar::-webkit-scrollbar {

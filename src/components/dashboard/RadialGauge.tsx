@@ -14,6 +14,7 @@ interface RadialGaugeProps {
   size?: number;
   value?: string;
   statsData?: StatsData;
+  isHistorical?: boolean;
 }
 
 const SIGNAL_COLORS: Record<string, string> = {
@@ -24,7 +25,26 @@ const SIGNAL_COLORS: Record<string, string> = {
   "overvalued": "#ef4444",
 };
 
-export default function RadialGauge({ signal, size = 280, value, statsData }: RadialGaugeProps) {
+// Past-tense transformations for Time Travel
+const getRetrospectiveText = (signal: string) => {
+  const labels: Record<string, string> = {
+    "strong-buy": "Was a Strong Buy",
+    "tactical-dip": "Was a Tactical Dip",
+    "buy": "Was a Buy Signal",
+    "hold": "Was a Hold Signal",
+    "overvalued": "Was Overvalued",
+  };
+  const actions: Record<string, string> = {
+    "strong-buy": "Ideal window for Aggressive Lumpsum",
+    "tactical-dip": "Opportunity for Lumpsum Top-up",
+    "buy": "Best to have continued SIP",
+    "hold": "Should have remained Neutral",
+    "overvalued": "Should have reduced Exposure",
+  };
+  return { label: labels[signal] || "Unknown", action: actions[signal] || "No recommendation" };
+};
+
+export default function RadialGauge({ signal, size = 280, value, statsData, isHistorical }: RadialGaugeProps) {
   const percentile = signal.pePercentile;
   const clampedPct = Math.max(0, Math.min(100, percentile));
   const needleAngle = -90 + (clampedPct / 100) * 180;
@@ -65,6 +85,7 @@ export default function RadialGauge({ signal, size = 280, value, statsData }: Ra
   const needleY = cy + needleLength * Math.sin(needleRad - Math.PI / 2);
 
   const signalColor = SIGNAL_COLORS[signal.signal] || "#6b7280";
+  const retroText = getRetrospectiveText(signal.signal);
 
   // Stats text positioning — aligned to the arc endpoints
   const leftArcX = cx - radius;
@@ -173,20 +194,20 @@ export default function RadialGauge({ signal, size = 280, value, statsData }: Ra
 
         {/* Center circle */}
         <circle cx={cx} cy={cy} r={size * 0.035} fill="currentColor" className="text-slate-800 dark:text-slate-400" />
-        <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-slate-100 shadow-sm" />
+        <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-slate-100" />
 
       </svg>
 
       {/* Signal label and action */}
-      <div className="text-center -mt-2">
+      <div className={`text-center ${isHistorical ? 'mt-1' : '-mt-2'}`}>
         <span
-          className="inline-block px-5 py-2 rounded-full text-[11px] font-black text-white uppercase tracking-wider shadow-md shadow-black/10 border border-white/10"
+          className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black text-white uppercase tracking-wider shadow-md shadow-black/10 border border-white/5"
           style={{ backgroundColor: signalColor }}
         >
-          {signal.label}
+          {isHistorical ? retroText.label : signal.label}
         </span>
-        <p className="text-sm text-foreground mt-3 font-bold">
-          {signal.recommendedAction}
+        <p className={`text-foreground font-bold px-4 max-w-[280px] ${isHistorical ? 'text-xs mt-3 opacity-90' : 'text-sm mt-3'}`}>
+          {isHistorical ? retroText.action : signal.recommendedAction}
         </p>
         <p className="text-[10px] text-muted mt-1 font-medium opacity-60">
           {percentile}{

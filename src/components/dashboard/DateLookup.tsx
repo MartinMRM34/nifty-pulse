@@ -101,16 +101,23 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                   setHistoricalSignal(null);
                   setSelectedSnapshot(null);
                 }}
+                onClick={(e) => {
+                  try {
+                    (e.currentTarget as any).showPicker();
+                  } catch (err) {
+                    // Fallback for older browsers
+                  }
+                }}
                 min={minDate}
                 max={maxDate}
-                className="w-full pl-4 pr-10 py-2.5 text-sm border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all font-bold group-hover:border-blue-500/30"
+                className="w-full pl-4 pr-10 py-2.5 text-sm border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all font-bold group-hover:border-blue-500/30 cursor-pointer"
               />
               <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted/40 pointer-events-none transition-colors group-focus-within:text-blue-500" />
             </div>
             <button
               onClick={() => handleLookup()}
               disabled={!selectedDate}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-xl shadow-blue-500/25 active:scale-95 flex items-center gap-2"
+              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-blue-500/15 active:scale-95 flex items-center gap-2"
             >
               Go
               <ArrowRight className="w-4 h-4" />
@@ -141,6 +148,7 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                   <RadialGauge
                     signal={historicalSignal}
                     size={150}
+                    isHistorical={true}
                     statsData={{
                       high: selectedSnapshot?.high?.toLocaleString("en-IN"),
                       low: selectedSnapshot?.low?.toLocaleString("en-IN"),
