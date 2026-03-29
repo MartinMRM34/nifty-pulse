@@ -42,7 +42,11 @@ async function fetchIndexValuation(indexId: IndexId): Promise<IndexValuation | n
         date: r.date,
         pe: r.pe,
         pb: r.pb,
-        dividendYield: r.dividendYield
+        dividendYield: r.dividendYield,
+        open: r.open,
+        high: r.high,
+        low: r.low,
+        close: r.close,
       }));
     }
     // No local fallback — if MongoDB has no data, history stays empty

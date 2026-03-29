@@ -19,6 +19,10 @@ export interface ValuationSnapshot {
   pe: number;
   pb: number;
   dividendYield: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  close?: number;
 }
 
 export interface ValuationStats {
@@ -57,4 +61,42 @@ export interface Constituent {
   tradedValue: number;
   lastPrice: number;
   pChange: number;
+}
+
+// ── v2 Tactical Signal Types ──
+
+export type Signal = "strong-buy" | "tactical-dip" | "buy" | "hold" | "overvalued";
+
+export type RecommendedMode = "Lumpsum + SIP" | "SIP Only" | "Neutral" | "Reduce";
+
+export interface TacticalSignal {
+  signal: Signal;
+  label: string;
+  recommendedAction: string;
+  recommendedMode: RecommendedMode;
+  allocationPercentage: number;
+  confidence: "High" | "Medium" | "Low";
+  yieldGap: number;
+  dmaDistance: number;
+  pePercentile: number;
+}
+
+export interface PulseSnapshot {
+  indexId: IndexId;
+  date: string;
+  pePercentile: number;
+  pbPercentile: number;
+  dyPercentile: number;
+  yieldGap: number;
+  dmaDistance: number;
+  signal: TacticalSignal;
+}
+
+export interface ThirukkuralVerse {
+  number: number;
+  tamil: string;
+  transliteration: string;
+  english: string;
+  topic: string;
+  category?: "BULLISH" | "BEARISH" | "NEUTRAL" | "GENERAL";
 }

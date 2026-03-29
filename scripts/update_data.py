@@ -137,8 +137,12 @@ def update_valuations(today: date):
             "pe":            safe_float(row.get("P/E", "")),
             "pb":            safe_float(row.get("P/B", "")),
             "dividendYield": safe_float(row.get("Div Yield", "")),
+            "open":          safe_float(row.get("Open Index Value", "")),
+            "high":          safe_float(row.get("High Index Value", "")),
+            "low":           safe_float(row.get("Low Index Value", "")),
+            "close":         safe_float(row.get("Closing Index Value", "")),
         }
-        print(f"  [{nse_name}] PE={entry['pe']}, PB={entry['pb']}, DY={entry['dividendYield']}")
+        print(f"  [{nse_name}] Close={entry['close']}, PE={entry['pe']}, PB={entry['pb']}")
 
         if db is not None:
             col_name = f"history_{index_id.replace('-', '_')}"

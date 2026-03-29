@@ -21,6 +21,7 @@ function getOverallPercentile(valuation: IndexValuation): number {
 export default function OverallSignal({ valuation }: OverallSignalProps) {
   const overallPercentile = getOverallPercentile(valuation);
   const zone = getZone(overallPercentile);
+  const latestSnapshot = valuation.history[valuation.history.length - 1];
 
   const signalMessage: Record<Zone, string> = {
     "deeply-undervalued": "Strong value opportunity. Historically rare valuation levels.",
@@ -57,6 +58,29 @@ export default function OverallSignal({ valuation }: OverallSignalProps) {
           <p className="text-sm text-gray-500 mt-1">{signalMessage[zone.zone]}</p>
         </div>
       </div>
+
+      {latestSnapshot?.close && (
+        <div className="mb-6 grid grid-cols-3 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Index Price</p>
+            <p className="text-base font-bold text-gray-900 dark:text-gray-100">
+              {latestSnapshot.close.toLocaleString("en-IN")}
+            </p>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day High</p>
+            <p className="text-base font-bold text-emerald-600 dark:text-emerald-400">
+              {latestSnapshot.high?.toLocaleString("en-IN")}
+            </p>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-center border border-gray-100 dark:border-gray-800">
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day Low</p>
+            <p className="text-base font-bold text-rose-600 dark:text-rose-400">
+              {latestSnapshot.low?.toLocaleString("en-IN")}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Zone bar */}
       <div className="mt-4">
