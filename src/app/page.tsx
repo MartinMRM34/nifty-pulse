@@ -272,9 +272,9 @@ export default function Home() {
         </div>
 
         {/* Hero: Radial Gauge + Recommendation Card */}
-        <div className={DS.LAYOUT.GRID_HERO}>
+        <div className={DS.LAYOUT.GRID_HERO + " items-stretch"}>
           {/* Radial Gauge */}
-          <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE} flex flex-col items-center justify-center lg:col-span-5`}>
+          <div className={`${DS.CARD.BASE} ${DS.CARD.P6} ${DS.CARD.INTERACTIVE} flex flex-col items-center justify-center lg:col-span-5 h-full`}>
             <div className="w-full flex items-center justify-between mb-2">
               <h3 className={DS.TEXT.LABEL}>
                 Tactical Pulse
@@ -300,7 +300,7 @@ export default function Home() {
           </div>
 
           {/* Recommendation + Stats */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="lg:col-span-7 flex flex-col gap-4 h-full">
             {/* SIP / Lumpsum Recommendation Card */}
             <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${!isYieldInfoOpen ? DS.CARD.INTERACTIVE : ""} ${isYieldInfoOpen ? 'relative z-50' : 'relative z-0'}`}>
               <div className="flex items-center justify-between mb-4">
@@ -421,13 +421,17 @@ export default function Home() {
               </div>
             </div>
 
-            <DateLookup valuation={valuation} />
+            <div className="flex-1">
+              <ThirukkuralCard signal={signal.signal} isHero={true} />
+            </div>
           </div>
         </div>
 
 
-        {/* Thirukkural — Market Wisdom */}
-        <ThirukkuralCard signal={signal.signal} />
+        {/* Historical Lookup — Time Travel */}
+        <div className="mt-4">
+          <DateLookup valuation={valuation} />
+        </div>
 
         {/* Metric Cards */}
         <div className={DS.LAYOUT.GRID_DASHBOARD}>

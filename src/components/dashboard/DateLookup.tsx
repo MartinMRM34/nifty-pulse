@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, ArrowRight, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import { IndexValuation, TacticalSignal, ValuationSnapshot } from "@/types";
 import { getInvestmentStrategy } from "@/lib/signals";
 import { DS } from "@/lib/design-system";
@@ -19,7 +19,7 @@ export default function DateLookup({ valuation }: DateLookupProps) {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [historicalSignal, setHistoricalSignal] = useState<TacticalSignal | null>(null);
   const [selectedSnapshot, setSelectedSnapshot] = useState<ValuationSnapshot | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Default to open in this new layout
 
   // Available date range
   const dates = valuation.history.map((h) => h.date);
@@ -73,26 +73,37 @@ export default function DateLookup({ valuation }: DateLookupProps) {
   };
 
   return (
-    <div className={`${DS.CARD.BASE} ${DS.CARD.P5} ${DS.CARD.INTERACTIVE}`}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 w-full text-left group"
-      >
-        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 transition-colors">
-          <Calendar className={DS.ICON.SM} />
+    <div className={`${DS.CARD.BASE} overflow-hidden border-blue-500/10 shadow-2xl`}>
+      {/* Sleek Header Section */}
+      <div className="flex flex-col sm:flex-row items-center justify-between p-5 gap-4 bg-slate-500/5 dark:bg-white/5 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-blue-500 text-white shadow-lg shadow-blue-500/20">
+            <Calendar className={DS.ICON.SM} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <h3 className={DS.TEXT.H2}>Historical Lookup</h3>
+              <span className="px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-500 text-[10px] font-black uppercase tracking-wider border border-blue-500/20">
+                {valuation.indexId.replace(/-/g, ' ')}
+              </span>
+            </div>
+            <p className={DS.TEXT.TINY_CAPS + " opacity-40"}>
+              Time Travel Engine v2.0 • <span className="text-foreground/60">Analysis Horizon: 1999–2026</span>
+            </p>
+          </div>
         </div>
-        <h3 className={`${DS.TEXT.H2} flex-1 text-left`}>
-          Historical Lookup
-        </h3>
-        <span className={`${DS.TEXT.TINY_CAPS} px-2.5 py-1 rounded-lg bg-blue-500/5 text-blue-600 dark:text-blue-400 border border-blue-500/10`}>
-          {isOpen ? "Close" : "Time Travel"}
-        </span>
-      </button>
 
-      {isOpen && (
-        <div className="mt-6 space-y-6">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 group">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center bg-card border border-border rounded-xl overflow-hidden group">
+            <button
+              onClick={() => navigate("prev")}
+              disabled={!canGoPrev}
+              className="p-2 hover:bg-slate-500/10 disabled:opacity-20 transition-all border-r border-border"
+              title="Previous Day"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="relative group">
               <input
                 type="date"
                 value={selectedDate}
@@ -104,72 +115,75 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                 onClick={(e) => {
                   try {
                     (e.currentTarget as any).showPicker();
-                  } catch (err) {
-                    // Fallback for older browsers
-                  }
+                  } catch (err) {}
                 }}
                 min={minDate}
                 max={maxDate}
-                className="w-full pl-4 pr-10 py-2.5 text-sm border border-border rounded-xl bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all font-bold group-hover:border-blue-500/30 cursor-pointer"
+                className="w-full pl-3 pr-8 py-1.5 text-xs bg-transparent text-foreground focus:outline-none transition-all font-bold cursor-pointer min-w-[120px]"
               />
-              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted/40 pointer-events-none transition-colors group-focus-within:text-blue-500" />
+              <Calendar className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/30 pointer-events-none" />
             </div>
             <button
-              onClick={() => handleLookup()}
-              disabled={!selectedDate}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-blue-500/15 active:scale-95 flex items-center gap-2"
+              onClick={() => navigate("next")}
+              disabled={!canGoNext}
+              className="p-2 hover:bg-slate-500/10 disabled:opacity-20 transition-all border-l border-border"
+              title="Next Day"
             >
-              Go
-              <ArrowRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
+          <button
+            onClick={() => handleLookup()}
+            disabled={!selectedDate}
+            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-700 disabled:opacity-30 transition-all shadow-md active:scale-95 flex items-center gap-2 ml-1"
+          >
+            Go
+            <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
 
-          {historicalSignal && (
-            <div className="pt-6 border-t border-border">
-              <p className={`${DS.TEXT.MUTED_CAPS} mb-6 text-center opacity-60 text-muted`}>
+      {/* Content Area */}
+      <div className={`p-8 ${!historicalSignal ? 'py-20 flex flex-col items-center justify-center text-center opacity-40' : ''}`}>
+        {!historicalSignal ? (
+          <div className="space-y-4">
+            <Activity className="w-12 h-12 text-blue-500 mx-auto animate-pulse" />
+            <p className={DS.TEXT.BODY_STRONG}>Select a date to begin your retrospective analysis</p>
+            <p className={DS.TEXT.TINY + " max-w-xs mx-auto"}>Compare historical market pulses, valuation percentiles, and technical indicators for any day in our database.</p>
+          </div>
+        ) : (
+          <div className="relative group">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-1 h-6 bg-blue-500/40 rounded-full" />
+              <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
                 Market Pulse on {new Date(selectedDate).toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
                 })}
               </p>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => navigate("prev")}
-                  disabled={!canGoPrev}
-                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all shrink-0"
-                  title="Previous Day"
-                >
-                  <ChevronLeft className={DS.ICON.MD} />
-                </button>
-
-                <div className="flex-1 min-w-0">
-                  <HorizontalPulseBar
-                    signal={historicalSignal}
-                    value={selectedSnapshot?.close?.toLocaleString("en-IN")}
-                    statsData={{
-                      high: selectedSnapshot?.high?.toLocaleString("en-IN"),
-                      low: selectedSnapshot?.low?.toLocaleString("en-IN"),
-                      open: selectedSnapshot?.open?.toLocaleString("en-IN"),
-                      close: selectedSnapshot?.close?.toLocaleString("en-IN"),
-                    }}
-                  />
-                </div>
-
-                <button
-                  onClick={() => navigate("next")}
-                  disabled={!canGoNext}
-                  className="p-2 border border-border rounded-full hover:bg-background disabled:opacity-20 transition-all shrink-0"
-                  title="Next Day"
-                >
-                  <ChevronRight className={DS.ICON.MD} />
-                </button>
-              </div>
             </div>
-          )}
-        </div>
-      )}
+
+            <HorizontalPulseBar
+              signal={historicalSignal}
+              value={selectedSnapshot?.close?.toLocaleString("en-IN")}
+              onPrev={() => navigate("prev")}
+              onNext={() => navigate("next")}
+              canPrev={canGoPrev}
+              canNext={canGoNext}
+              statsData={{
+                high: selectedSnapshot?.high?.toLocaleString("en-IN"),
+                low: selectedSnapshot?.low?.toLocaleString("en-IN"),
+                open: selectedSnapshot?.open?.toLocaleString("en-IN"),
+                close: selectedSnapshot?.close?.toLocaleString("en-IN"),
+                pe: selectedSnapshot?.pe?.toFixed(2),
+                pb: selectedSnapshot?.pb?.toFixed(2),
+                dy: selectedSnapshot?.dividendYield !== undefined ? `${selectedSnapshot.dividendYield.toFixed(2)}%` : "—",
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
