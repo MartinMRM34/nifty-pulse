@@ -8,7 +8,7 @@
 
 | Feature | Current State | v2 Requirement | Status |
 |---------|--------------|----------------|--------|
-| Multi-index support | 6 indices (Nifty 50, Next 50, Midcap 150, Smallcap 250, LargeMidcap 250, 500) | Focus on 4: Nifty 50, Next 50, Midcap 150, Smallcap 250 | Refocus needed |
+| Multi-index support | 6 indices (Nifty 50, Next 50, Midcap 150, Smallcap 250, LargeMidcap 250, 500) | All 6 indices with dedicated dashboards | Exists |
 | P/E, P/B, DY data | 10-year historical via MongoDB | Same | Exists |
 | Percentile calculation | Basic percentile rank | Same + Yield Gap + 200-DMA distance | Extend |
 | Signal system | 5-zone weighted percentile (Deeply Undervalued → Deeply Overvalued) | New Signal Matrix (Strong Buy → Overvalued) with SIP/Lumpsum advice | Rewrite |
@@ -29,10 +29,10 @@
 
 **Goal:** Solidify the data layer, add new data sources, and set up snapshot persistence.
 
-### 1.1 — Refocus Index Configuration
+### 1.1 — Verify All 6 Index Configurations
 - **File:** `src/lib/constants.ts`
-- Update `INDICES` to mark the 4 target indices (Nifty 50, Next 50, Midcap 150, Smallcap 250) as primary
-- Keep LargeMidcap 250 and Nifty 500 as secondary/hidden (don't delete data)
+- Ensure all 6 indices (Nifty 50, Next 50, Midcap 150, Smallcap 250, LargeMidcap 250, Nifty 500) are enabled and have dedicated dashboards
+- Validate data pipelines and snapshot storage cover all 6 indices
 
 ### 1.2 — Add 10-Year G-Sec Yield Data Source
 - **New file:** `src/data/gsec.ts`
@@ -321,6 +321,6 @@
 ## Success Criteria (from v2 doc)
 
 1. **Actionable Advice** — Users know whether to Lumpsum or SIP within 3 seconds of looking
-2. **Multi-Index Coverage** — All 4 target indices have dedicated dashboards
+2. **Multi-Index Coverage** — All 6 indices (Nifty 50, Next 50, Midcap 150, Smallcap 250, LargeMidcap 250, Nifty 500) have dedicated dashboards
 3. **Historical Integrity** — Date-Wise Lookup returns accurate data for any stored date
 4. **Aesthetic Excellence** — Premium look on both 4K screens and mobile devices
