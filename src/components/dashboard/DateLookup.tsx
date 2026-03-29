@@ -121,54 +121,66 @@ export default function DateLookup({ valuation }: DateLookupProps) {
                 })}
               </p>
               
-              <div className="flex items-center justify-between gap-2 overflow-hidden">
+              <div className="flex items-center justify-between gap-1 overflow-hidden">
                 <button
                   onClick={() => navigate("prev")}
                   disabled={!canGoPrev}
-                  className="p-2 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1"
+                  className="p-1.5 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1 shrink-0"
                   title="See previous market day"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600">Prev Day</span>
+                  <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600 px-1">Prev Day</span>
                 </button>
 
-                <div className="flex-1 min-w-0">
-                  <RadialGauge signal={historicalSignal} size={200} />
+                {/* Left side stats: High / Low */}
+                <div className="flex flex-col gap-3 text-right min-w-[60px] shrink-0">
+                  <div className="space-y-0.5">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day High</p>
+                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      {selectedSnapshot?.high?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day Low</p>
+                    <p className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                      {selectedSnapshot?.low?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0 flex justify-center">
+                  <RadialGauge 
+                    signal={historicalSignal} 
+                    size={180} 
+                  />
+                </div>
+
+                {/* Right side stats: Close / Open */}
+                <div className="flex flex-col gap-3 text-left min-w-[70px] shrink-0">
+                  <div className="space-y-0.5">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Index Close</p>
+                    <p className="text-xs font-bold text-gray-900 dark:text-white">
+                      {selectedSnapshot?.close?.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[9px] text-gray-400 uppercase tracking-tighter">Day Open</p>
+                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                      {selectedSnapshot?.open?.toLocaleString("en-IN") || "-"}
+                    </p>
+                  </div>
                 </div>
 
                 <button
                   onClick={() => navigate("next")}
                   disabled={!canGoNext}
-                  className="p-2 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1"
+                  className="p-1.5 border border-gray-100 dark:border-gray-800 rounded-full hover:bg-gray-50 dark:hover:bg-gray-900 disabled:opacity-30 transition-all group flex flex-col items-center gap-1 shrink-0"
                   title="See next market day"
                 >
-                  <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600">Next Day</span>
+                  <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <span className="text-[10px] whitespace-nowrap hidden md:block text-gray-400 group-hover:text-gray-600 px-1">Next Day</span>
                 </button>
               </div>
-
-              {selectedSnapshot?.close && (
-                <div className="mt-4 grid grid-cols-3 gap-2 px-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Index Close</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                      {selectedSnapshot.close.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day High</p>
-                    <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                      {selectedSnapshot.high?.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Day Low</p>
-                    <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
-                      {selectedSnapshot.low?.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>

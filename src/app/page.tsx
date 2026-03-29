@@ -8,6 +8,7 @@ import { INDICES } from "@/lib/constants";
 import { getInvestmentStrategy } from "@/lib/signals";
 import { getTodayVerse } from "@/data/thirukkural";
 import { speak } from "@/lib/voice";
+import { IndexChips } from "@/components/ui/IndexSelector";
 import IndexSelector from "@/components/ui/IndexSelector";
 import MetricCard from "@/components/dashboard/MetricCard";
 import RadialGauge from "@/components/dashboard/RadialGauge";
@@ -169,46 +170,67 @@ export default function Home() {
           </div>
         )}
 
-        {/* Top Section: Index Selector + Actions */}
-        <div>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1">
-                {indexMeta.name}
-              </h2>
-              <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                {indexMeta.description}
-              </p>
+        {/* Top Section: Header + Selector + Actions */}
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 whitespace-nowrap">
+                  {indexMeta.name}
+                </h2>
+                <p className="hidden sm:block text-[10px] font-normal text-gray-500 dark:text-gray-400 max-w-[200px] truncate">
+                  {indexMeta.description}
+                </p>
+              </div>
+              <div className="h-6 w-[1px] bg-gray-200 dark:bg-gray-800 hidden md:block" />
+              <div className="flex-1">
+                <IndexChips selected={selectedIndex} onChange={setSelectedIndex} />
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setIsConstituentsModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-xs font-semibold transition-all shadow-sm"
               >
                 <List className="w-4 h-4" />
                 Constituents
               </button>
               <button
                 onClick={() => setIsAlertModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-400 rounded-xl text-xs font-semibold transition-all shadow-sm"
               >
                 <BellRing className="w-4 h-4" />
                 Set Alert
               </button>
             </div>
           </div>
-          <IndexSelector selected={selectedIndex} onChange={setSelectedIndex} />
+          {/* <IndexSelector selected={selectedIndex} onChange={setSelectedIndex} /> */}
         </div>
 
         {/* Hero: Radial Gauge + Recommendation Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Radial Gauge */}
           <div className="lg:col-span-5 bg-white dark:bg-[#0a0a0a] rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm flex flex-col items-center justify-center">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 self-start">
-              Tactical Pulse
-            </h3>
-            <RadialGauge signal={signal} />
+            <div className="w-full flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                Tactical Pulse
+              </h3>
+              <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                {new Date(valuation.lastUpdated).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            
+            <RadialGauge 
+              signal={signal} 
+              size={260} 
+              value={valuation.history[valuation.history.length - 1].close?.toLocaleString("en-IN")} 
+            />
+
             <p className="mt-3 text-[10px] text-gray-400 italic text-center">
               Based on P/E percentile, 200-DMA distance, and yield gap analysis
             </p>

@@ -5,6 +5,7 @@ import { TacticalSignal } from "@/types";
 interface RadialGaugeProps {
   signal: TacticalSignal;
   size?: number;
+  value?: string;
 }
 
 const SIGNAL_COLORS: Record<string, string> = {
@@ -15,7 +16,7 @@ const SIGNAL_COLORS: Record<string, string> = {
   "overvalued": "#ef4444",
 };
 
-export default function RadialGauge({ signal, size = 280 }: RadialGaugeProps) {
+export default function RadialGauge({ signal, size = 280, value }: RadialGaugeProps) {
   // Map percentile (0-100) to angle on the 180° arc
   // 0 = far left (strong buy), 100 = far right (overvalued)
   const percentile = signal.pePercentile;
@@ -57,7 +58,7 @@ export default function RadialGauge({ signal, size = 280 }: RadialGaugeProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <svg width={size} height={size * 0.65} viewBox={`0 0 ${size} ${size * 0.65}`}>
+      <svg width={size} height={size * 0.7} viewBox={`0 0 ${size} ${size * 0.7}`}>
         {/* Zone arcs */}
         {zones.map((z) => (
           <path
@@ -71,6 +72,19 @@ export default function RadialGauge({ signal, size = 280 }: RadialGaugeProps) {
           />
         ))}
 
+        {/* Central Value (Price) */}
+        {value && (
+          <text
+            x={cx}
+            y={cy - (size * 0.05)}
+            textAnchor="middle"
+            className="font-bold fill-gray-900 dark:fill-gray-100"
+            style={{ fontSize: `${size * 0.09}px` }}
+          >
+            {value}
+          </text>
+        )}
+
         {/* Needle */}
         <line
           x1={cx}
@@ -78,23 +92,22 @@ export default function RadialGauge({ signal, size = 280 }: RadialGaugeProps) {
           x2={needleX}
           y2={needleY}
           stroke="#1f2937"
-          strokeWidth={3}
+          strokeWidth={size * 0.012}
           strokeLinecap="round"
-          className="transition-all duration-700 ease-out"
+          className="transition-all duration-700 ease-out dark:stroke-gray-400"
         />
 
         {/* Center circle */}
-        <circle cx={cx} cy={cy} r={8} fill="#1f2937" />
-        <circle cx={cx} cy={cy} r={4} fill="white" />
+        <circle cx={cx} cy={cy} r={size * 0.03} fill="#1f2937" className="dark:fill-gray-600" />
+        <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-gray-100" />
 
         {/* Percentile label under needle hub */}
         <text
           x={cx}
-          y={cy + 28}
+          y={cy + (size * 0.12)}
           textAnchor="middle"
-          className="text-sm font-bold"
-          fill="#374151"
-          fontSize={14}
+          className="font-semibold fill-gray-400 dark:fill-gray-500"
+          style={{ fontSize: `${size * 0.045}px` }}
         >
           {percentile}th percentile
         </text>
