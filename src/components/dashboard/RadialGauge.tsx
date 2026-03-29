@@ -101,20 +101,10 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
         <circle cx={cx} cy={cy} r={size * 0.03} fill="#1f2937" className="dark:fill-gray-600" />
         <circle cx={cx} cy={cy} r={size * 0.015} fill="white" className="dark:fill-gray-100" />
 
-        {/* Percentile label under needle hub */}
-        <text
-          x={cx}
-          y={cy + (size * 0.12)}
-          textAnchor="middle"
-          className="font-semibold fill-gray-400 dark:fill-gray-500"
-          style={{ fontSize: `${size * 0.045}px` }}
-        >
-          {percentile}th percentile
-        </text>
       </svg>
 
       {/* Signal label and action */}
-      <div className="text-center -mt-1">
+      <div className="text-center -mt-2">
         <span
           className="inline-block px-4 py-1.5 rounded-full text-sm font-bold text-white"
           style={{ backgroundColor: signalColor }}
@@ -123,6 +113,9 @@ export default function RadialGauge({ signal, size = 280, value }: RadialGaugePr
         </span>
         <p className="text-sm text-gray-500 mt-2 font-medium">
           {signal.recommendedAction}
+        </p>
+        <p className="text-[10px] text-gray-400 mt-1">
+          {percentile}th percentile
         </p>
       </div>
     </div>
